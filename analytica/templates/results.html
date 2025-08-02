@@ -1,0 +1,155 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Analysis Results - Analytica</title>
+    
+    <!-- Bootstrap CSS -->
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+    <!-- Bootstrap Icons -->
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.10.0/font/bootstrap-icons.css" rel="stylesheet">
+    
+    <style>
+        .results-section {
+            background: linear-gradient(135deg, #007bff 0%, #6610f2 100%);
+            color: white;
+            padding: 60px 0;
+        }
+        
+        .navbar-brand {
+            font-weight: 700;
+            font-size: 1.5rem;
+        }
+    </style>
+</head>
+<body>
+    <!-- Navigation -->
+    <nav class="navbar navbar-expand-lg navbar-dark bg-dark">
+        <div class="container">
+            <a class="navbar-brand" href="{% url 'home' %}">
+                <i class="bi bi-graph-up"></i> Analytica
+            </a>
+            <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarNav">
+                <span class="navbar-toggler-icon"></span>
+            </button>
+            <div class="collapse navbar-collapse" id="navbarNav">
+                <ul class="navbar-nav ms-auto">
+                    <li class="nav-item">
+                        <a class="nav-link" href="{% url 'home' %}">Home</a>
+                    </li>
+                    <li class="nav-item">
+                        <a class="nav-link active" href="#results">Results</a>
+                    </li>
+                </ul>
+            </div>
+        </div>
+    </nav>
+
+    <!-- Results Section -->
+    <section class="results-section">
+        <div class="container">
+            <div class="row text-center">
+                <div class="col-12">
+                    <i class="bi bi-graph-up-arrow" style="font-size: 4rem;"></i>
+                    <h1 class="display-4 fw-bold mt-3 mb-4">Analysis Complete!</h1>
+                    <p class="lead">
+                        Your dataset has been analyzed successfully. 
+                        Here are the results and insights.
+                    </p>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- Results Content -->
+    <section class="py-5">
+        <div class="container">
+            <div class="row">
+                <div class="col-lg-10 mx-auto">
+                    <!-- Dataset Summary -->
+                    <div class="card mb-4">
+                        <div class="card-header">
+                            <h5 class="mb-0">
+                                <i class="bi bi-table"></i> Dataset Summary
+                            </h5>
+                        </div>
+                        <div class="card-body">
+                            <div class="row">
+                                <div class="col-md-6">
+                                    <p><strong>Total Rows:</strong> {{ cleaned_dataset.shape.0 }}</p>
+                                    <p><strong>Total Columns:</strong> {{ cleaned_dataset.shape.1 }}</p>
+                                </div>
+                                <div class="col-md-6">
+                                    <p><strong>Numeric Columns:</strong> {{ cleaned_dataset.cleaning_report.cleaning_summary.numeric_columns }}</p>
+                                    <p><strong>Categorical Columns:</strong> {{ cleaned_dataset.cleaning_report.cleaning_summary.categorical_columns }}</p>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Cleaning Report -->
+                    <div class="card mb-4">
+                        <div class="card-header">
+                            <h5 class="mb-0">
+                                <i class="bi bi-brush"></i> Data Cleaning Report
+                            </h5>
+                        </div>
+                        <div class="card-body">
+                            <div class="row">
+                                <div class="col-md-6">
+                                    <p><strong>Missing Values:</strong> {{ cleaned_dataset.cleaning_report.cleaning_summary.total_missing_values }}</p>
+                                    <p><strong>Duplicate Rows:</strong> {{ cleaned_dataset.cleaning_report.cleaning_summary.total_duplicate_rows }}</p>
+                                </div>
+                                <div class="col-md-6">
+                                    <p><strong>Datetime Columns:</strong> {{ cleaned_dataset.cleaning_report.cleaning_summary.datetime_columns }}</p>
+                                    <p><strong>Datetime Features:</strong> {{ cleaned_dataset.cleaning_report.cleaning_summary.datetime_feature_columns }}</p>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Column Information -->
+                    <div class="card mb-4">
+                        <div class="card-header">
+                            <h5 class="mb-0">
+                                <i class="bi bi-list-ul"></i> Processed Columns
+                            </h5>
+                        </div>
+                        <div class="card-body">
+                            <div class="row">
+                                {% for column in cleaned_dataset.columns %}
+                                <div class="col-md-4 mb-2">
+                                    <span class="badge bg-success">{{ column }}</span>
+                                </div>
+                                {% endfor %}
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Action Buttons -->
+                    <div class="text-center">
+                        <a href="{% url 'home' %}" class="btn btn-primary btn-lg">
+                            <i class="bi bi-upload"></i> Upload Another Dataset
+                        </a>
+                        <button class="btn btn-outline-secondary btn-lg ms-3" onclick="downloadReport()">
+                            <i class="bi bi-download"></i> Download Report
+                        </button>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- Bootstrap JS -->
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+    
+    <!-- Custom JavaScript -->
+    <script>
+        function downloadReport() {
+            // This would generate and download a PDF report
+            alert('Report download feature coming soon!');
+        }
+    </script>
+</body>
+</html> 

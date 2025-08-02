@@ -1,0 +1,386 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Analytica - AI-Powered Data Analysis</title>
+    
+    <!-- Bootstrap CSS -->
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+    <!-- Bootstrap Icons -->
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.10.0/font/bootstrap-icons.css" rel="stylesheet">
+    <!-- Custom CSS -->
+    <style>
+        .hero-section {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            padding: 100px 0;
+        }
+        
+        .upload-section {
+            background-color: #f8f9fa;
+            padding: 80px 0;
+        }
+        
+        .feature-card {
+            transition: transform 0.3s ease;
+            border: none;
+            box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+        }
+        
+        .feature-card:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 8px 15px rgba(0, 0, 0, 0.2);
+        }
+        
+        .upload-area {
+            border: 2px dashed #dee2e6;
+            border-radius: 10px;
+            padding: 40px;
+            text-align: center;
+            transition: all 0.3s ease;
+            background-color: white;
+        }
+        
+        .upload-area:hover {
+            border-color: #667eea;
+            background-color: #f8f9ff;
+        }
+        
+        .upload-area.dragover {
+            border-color: #667eea;
+            background-color: #e8f2ff;
+        }
+        
+        .file-input {
+            display: none;
+        }
+        
+        .btn-primary {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            border: none;
+            padding: 12px 30px;
+            border-radius: 25px;
+            font-weight: 600;
+        }
+        
+        .btn-primary:hover {
+            background: linear-gradient(135deg, #5a6fd8 0%, #6a4190 100%);
+            transform: translateY(-2px);
+        }
+        
+        .navbar-brand {
+            font-weight: 700;
+            font-size: 1.5rem;
+        }
+        
+        .footer {
+            background-color: #343a40;
+            color: white;
+            padding: 40px 0;
+        }
+    </style>
+</head>
+<body>
+    <!-- Navigation -->
+    <nav class="navbar navbar-expand-lg navbar-dark bg-dark">
+        <div class="container">
+            <a class="navbar-brand" href="#">
+                <i class="bi bi-graph-up"></i> Analytica
+            </a>
+            <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarNav">
+                <span class="navbar-toggler-icon"></span>
+            </button>
+            <div class="collapse navbar-collapse" id="navbarNav">
+                <ul class="navbar-nav ms-auto">
+                    <li class="nav-item">
+                        <a class="nav-link active" href="#home">Home</a>
+                    </li>
+                    <li class="nav-item">
+                        <a class="nav-link" href="#features">Features</a>
+                    </li>
+                    <li class="nav-item">
+                        <a class="nav-link" href="#upload">Upload</a>
+                    </li>
+                </ul>
+            </div>
+        </div>
+    </nav>
+
+    <!-- Hero Section -->
+    <section id="home" class="hero-section">
+        <div class="container">
+            <div class="row align-items-center">
+                <div class="col-lg-6">
+                    <h1 class="display-4 fw-bold mb-4">
+                        AI-Powered Data Analysis
+                    </h1>
+                    <p class="lead mb-4">
+                        Upload your dataset and get instant AI-powered insights. 
+                        Our advanced analysis engine works with any dataset format 
+                        and provides comprehensive statistical analysis.
+                    </p>
+                    <a href="#upload" class="btn btn-light btn-lg">
+                        <i class="bi bi-upload"></i> Start Analyzing
+                    </a>
+                </div>
+                <div class="col-lg-6 text-center">
+                    <i class="bi bi-graph-up-arrow" style="font-size: 8rem; opacity: 0.8;"></i>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- Features Section -->
+    <section id="features" class="py-5">
+        <div class="container">
+            <div class="row text-center mb-5">
+                <div class="col-12">
+                    <h2 class="display-5 fw-bold">Why Choose Analytica?</h2>
+                    <p class="lead text-muted">Advanced features for comprehensive data analysis</p>
+                </div>
+            </div>
+            <div class="row g-4">
+                <div class="col-md-4">
+                    <div class="card feature-card h-100">
+                        <div class="card-body text-center p-4">
+                            <i class="bi bi-robot text-primary" style="font-size: 3rem;"></i>
+                            <h5 class="card-title mt-3">AI-Powered Analysis</h5>
+                            <p class="card-text">
+                                Get intelligent insights from your data using advanced AI models. 
+                                Our system automatically detects patterns and provides meaningful analysis.
+                            </p>
+                        </div>
+                    </div>
+                </div>
+                <div class="col-md-4">
+                    <div class="card feature-card h-100">
+                        <div class="card-body text-center p-4">
+                            <i class="bi bi-file-earmark-spreadsheet text-success" style="font-size: 3rem;"></i>
+                            <h5 class="card-title mt-3">Multiple Formats</h5>
+                            <p class="card-text">
+                                Support for Excel (.xlsx, .xls), CSV files, and more. 
+                                Automatic data cleaning and preprocessing for optimal results.
+                            </p>
+                        </div>
+                    </div>
+                </div>
+                <div class="col-md-4">
+                    <div class="card feature-card h-100">
+                        <div class="card-body text-center p-4">
+                            <i class="bi bi-speedometer2 text-warning" style="font-size: 3rem;"></i>
+                            <h5 class="card-title mt-3">Fast & Accurate</h5>
+                            <p class="card-text">
+                                Lightning-fast analysis with high accuracy. 
+                                Real-time processing and comprehensive statistical reports.
+                            </p>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- Upload Section -->
+    <section id="upload" class="upload-section">
+        <div class="container">
+            <div class="row justify-content-center">
+                <div class="col-lg-8">
+                    <div class="text-center mb-5">
+                        <h2 class="display-5 fw-bold">Upload Your Dataset</h2>
+                        <p class="lead text-muted">
+                            Upload your dataset and get instant AI-powered analysis
+                        </p>
+                    </div>
+                    
+                    <!-- Upload Form -->
+                    <form method="post" enctype="multipart/form-data" id="uploadForm">
+                        {% csrf_token %}
+                        <div class="upload-area" id="uploadArea">
+                            <i class="bi bi-cloud-upload text-muted" style="font-size: 4rem;"></i>
+                            <h4 class="mt-3 mb-3">Drag & Drop your file here</h4>
+                            <p class="text-muted mb-4">
+                                or click to browse files
+                            </p>
+                            <input type="file" name="dataset" id="fileInput" class="file-input" 
+                                   accept=".xlsx,.xls,.csv" required>
+                            <button type="button" class="btn btn-primary" onclick="document.getElementById('fileInput').click()">
+                                <i class="bi bi-folder2-open"></i> Choose File
+                            </button>
+                            <div id="fileInfo" class="mt-3" style="display: none;">
+                                <div class="alert alert-info">
+                                    <i class="bi bi-file-earmark-check"></i>
+                                    <span id="fileName"></span>
+                                </div>
+                            </div>
+                        </div>
+                        
+                        <!-- Analysis Options -->
+                        <div class="row mt-4">
+                            <div class="col-md-6">
+                                <div class="form-check">
+                                    <input class="form-check-input" type="checkbox" id="performCleaning" checked>
+                                    <label class="form-check-label" for="performCleaning">
+                                        <i class="bi bi-brush"></i> Perform Data Cleaning
+                                    </label>
+                                </div>
+                            </div>
+                            <div class="col-md-6">
+                                <div class="form-check">
+                                    <input class="form-check-input" type="checkbox" id="generateReport" checked>
+                                    <label class="form-check-label" for="generateReport">
+                                        <i class="bi bi-file-text"></i> Generate Analysis Report
+                                    </label>
+                                </div>
+                            </div>
+                        </div>
+                        
+                        <!-- Submit Button -->
+                        <div class="text-center mt-4">
+                            <button type="submit" class="btn btn-primary btn-lg" id="submitBtn" disabled>
+                                <i class="bi bi-play-circle"></i> Start Analysis
+                            </button>
+                        </div>
+                    </form>
+                    
+                    <!-- Progress Bar (Hidden by default) -->
+                    <div id="progressSection" class="mt-4" style="display: none;">
+                        <div class="progress">
+                            <div class="progress-bar progress-bar-striped progress-bar-animated" 
+                                 role="progressbar" style="width: 0%"></div>
+                        </div>
+                        <p class="text-center mt-2" id="progressText">Preparing analysis...</p>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- Footer -->
+    <footer class="footer">
+        <div class="container">
+            <div class="row">
+                <div class="col-md-6">
+                    <h5><i class="bi bi-graph-up"></i> Analytica</h5>
+                    <p class="text-muted">
+                        AI-powered data analysis platform for comprehensive insights.
+                    </p>
+                </div>
+                <div class="col-md-6 text-md-end">
+                    <p class="text-muted">
+                        © 2024 Analytica. All rights reserved.
+                    </p>
+                </div>
+            </div>
+        </div>
+    </footer>
+
+    <!-- Bootstrap JS -->
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+    
+    <!-- Custom JavaScript -->
+    <script>
+        // File upload handling
+        const fileInput = document.getElementById('fileInput');
+        const uploadArea = document.getElementById('uploadArea');
+        const fileInfo = document.getElementById('fileInfo');
+        const fileName = document.getElementById('fileName');
+        const submitBtn = document.getElementById('submitBtn');
+        const progressSection = document.getElementById('progressSection');
+        const progressBar = document.querySelector('.progress-bar');
+        const progressText = document.getElementById('progressText');
+
+        // Drag and drop functionality
+        uploadArea.addEventListener('dragover', (e) => {
+            e.preventDefault();
+            uploadArea.classList.add('dragover');
+        });
+
+        uploadArea.addEventListener('dragleave', () => {
+            uploadArea.classList.remove('dragover');
+        });
+
+        uploadArea.addEventListener('drop', (e) => {
+            e.preventDefault();
+            uploadArea.classList.remove('dragover');
+            const files = e.dataTransfer.files;
+            if (files.length > 0) {
+                fileInput.files = files;
+                handleFileSelect();
+            }
+        });
+
+        // File input change
+        fileInput.addEventListener('change', handleFileSelect);
+
+        function handleFileSelect() {
+            const file = fileInput.files[0];
+            if (file) {
+                // Validate file type
+                const allowedTypes = ['.xlsx', '.xls', '.csv'];
+                const fileExtension = '.' + file.name.split('.').pop().toLowerCase();
+                
+                if (allowedTypes.includes(fileExtension)) {
+                    fileName.textContent = `Selected: ${file.name} (${(file.size / 1024 / 1024).toFixed(2)} MB)`;
+                    fileInfo.style.display = 'block';
+                    submitBtn.disabled = false;
+                } else {
+                    alert('Please select a valid file type (.xlsx, .xls, or .csv)');
+                    fileInput.value = '';
+                    fileInfo.style.display = 'none';
+                    submitBtn.disabled = true;
+                }
+            }
+        }
+
+        // Form submission
+        document.getElementById('uploadForm').addEventListener('submit', function(e) {
+            e.preventDefault();
+            
+            // Show progress
+            progressSection.style.display = 'block';
+            submitBtn.disabled = true;
+            
+            // Simulate progress (replace with actual upload handling)
+            let progress = 0;
+            const interval = setInterval(() => {
+                progress += 10;
+                progressBar.style.width = progress + '%';
+                
+                if (progress <= 30) {
+                    progressText.textContent = 'Uploading file...';
+                } else if (progress <= 60) {
+                    progressText.textContent = 'Processing data...';
+                } else if (progress <= 90) {
+                    progressText.textContent = 'Generating analysis...';
+                } else {
+                    progressText.textContent = 'Analysis complete!';
+                    clearInterval(interval);
+                    
+                    // Redirect to results page (you'll create this)
+                    setTimeout(() => {
+                        window.location.href = '/results/';
+                    }, 1000);
+                }
+            }, 200);
+            
+            // Submit the form
+            this.submit();
+        });
+
+        // Smooth scrolling for navigation links
+        document.querySelectorAll('a[href^="#"]').forEach(anchor => {
+            anchor.addEventListener('click', function (e) {
+                e.preventDefault();
+                const target = document.querySelector(this.getAttribute('href'));
+                if (target) {
+                    target.scrollIntoView({
+                        behavior: 'smooth',
+                        block: 'start'
+                    });
+                }
+            });
+        });
+    </script>
+</body>
+</html>
