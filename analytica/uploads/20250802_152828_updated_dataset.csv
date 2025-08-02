@@ -1,0 +1,151 @@
+doctor_name,status,survival_time_in_months,sex,age,age_group,location,latarality,hpr,grade,surgery type,gfap,idh,atrx,mgmt,rt dose,rt modality,ccrt,adjuvant cht
+Prof. Dr. Qamruzzaman Chowdhury,Censored,5.63013698630137,Female,12.28888888888889,1,TEMPORAL,LEFT,GBM,Grade IV,STR,POSITIVE,not done,not done,not done,no RT,not available,not available,not available
+Prof. Dr. Qamruzzaman Chowdhury,Censored,3.797260273972603,Female,39.38888888888889,2,CP ANGLE,RIGHT,ASTROCYTOMA,Grade III,GTR,POSITIVE,NEGATIVE,not done,not done,no RT,not available,not available,not available
+Prof. Dr. Qamruzzaman Chowdhury,Censored,5.6,Female,58.58611111111111,3,TEMPORO-PARIETAL,LEFT,ASTROCYTOMA,Grade II,GTR,not done,not done,not done,not done,no RT,not available,not available,not available
+Prof. Dr. Qamruzzaman Chowdhury,Dead,1.063013698630137,Male,62.638888888888886,4,PARIETAL,RIGHT,GBM,Grade IV,NTR,not done,not done,not done,not done,no RT,not available,not available,not available
+Prof. Dr. Qamruzzaman Chowdhury,Dead,1.4328767123287671,Male,51.44722222222222,3,FRONTAL,RIGHT,ASTROCYTOMA,Grade II,GTR,POSITIVE,not done,not done,not done,no RT,not available,not available,not available
+Prof. Dr. Qamruzzaman Chowdhury,Censored,5.545205479452055,Male,47.019444444444446,3,TEMPORAL,LEFT,GBM,Grade IV,GTR,not done,not done,not done,Negative,60 Gy in 30#,not available,not available,TMZ
+Prof. Dr. Qamruzzaman Chowdhury,Censored,3.367123287671233,Female,37.855555555555554,2,TEMPORAL,RIGHT,OLIGODENDROGLIOMA,Grade II,GTR,not done,POSITIVE,not done,not done,60 Gy in 30#,not available,not available,Vincristine + Procarbazine + CCNU
+Prof. Dr. Qamruzzaman Chowdhury,Alive,5.761643835616439,Male,34.297222222222224,2,FRONTAL,RIGHT,OLIGODENDROGLIOMA,Grade II,GTR,not done,POSITIVE,not done,not done,no RT,not available,not available,not available
+Prof. Dr. Qamruzzaman Chowdhury,Censored,5.4301369863013695,Female,58.425000000000004,3,TEMPORAL,RIGHT,GBM,Grade IV,NTR,not done,not done,not done,not done,no RT,not available,not available,not available
+Prof. Dr. Qamruzzaman Chowdhury,Censored,5.36986301369863,Female,64.41388888888889,4,FRONTO-TEMPORAL,LEFT,GBM,Grade IV,GTR,not done,not done,not done,not done,59.4 Gy in 33#,not available,not available,TMZ
+Prof. Dr. Qamruzzaman Chowdhury,Censored,5.23013698630137,Female,56.605555555555554,3,FRONTAL,RIGHT,ASTROCYTOMA,Grade III,GTR,not done,not done,not done,not done,no RT,not available,not available,not available
+Prof. Dr. Qamruzzaman Chowdhury,Censored,5.186301369863013,Female,53.11388888888889,3,TEMPORAL,RIGHT,GBM,Grade IV,GTR,not done,not done,not done,Negative,no RT,not available,not available,not available
+Prof. Dr. Qamruzzaman Chowdhury,Alive,5.975342465753425,Female,29.583333333333332,2,FRONTO-PARIETAL,LEFT,ASTROCYTOMA,Grade II,STR,not done,POSITIVE,not done,,no RT,not available,not available,TMZ
+Prof. Dr. Qamruzzaman Chowdhury,Alive,5.515068493150685,Female,42.830555555555556,3,PARIETAL,LEFT,OLIGODENDROGLIOMA,Grade II,GTR,POSITIVE,POSITIVE,not done,not done,54 Gy in 27#,not available,not available,Vincristine + Procarbazine
+Prof. Dr. Qamruzzaman Chowdhury,Censored,5.054794520547945,Male,49.68611111111111,3,FRONTAL,RIGHT,GBM,Grade IV,GTR,not done,not done,not done,not done,no RT,not available,not available,not available
+Prof. Dr. Qamruzzaman Chowdhury,Censored,5.145205479452055,Male,54.919444444444444,3,FRONTAL,LEFT,GBM,Grade IV,GTR,not done,not done,not done,not done,60 Gy in 30#,not available,not available,not available
+Prof. Dr. Qamruzzaman Chowdhury,Dead,0.7342465753424657,Male,43.730555555555554,3,TEMPORAL,LEFT,GBM,Grade IV,STR,POSITIVE,not done,not done,not done,60 Gy in 30#,not available,not available,not available
+Prof. Dr. Qamruzzaman Chowdhury,Dead,1.641095890410959,Female,60.48888888888889,4,TEMPORAL,RIGHT,GBM,Grade IV,GTR,not done,not done,not done,not done,no RT,not available,not available,not available
+Prof. Dr. Qamruzzaman Chowdhury,Alive,5.50958904109589,Male,37.43333333333333,2,PARIETAL,RIGHT,GBM,Grade IV,GTR,not done,not done,not done,not done,59.4 Gy in 33#,not available,,TMZ
+Prof. Dr. Qamruzzaman Chowdhury,Dead,0.26575342465753427,Female,67.83888888888889,4,VENTRICLE,CENTRAL,GBM,Grade IV,GTR,POSITIVE,POSITIVE,not done,POSITIVE,no RT,not available,not available,TMZ
+Prof. Dr. Qamruzzaman Chowdhury,Dead,0.6109589041095891,Male,80.925,4,FRONTAL,RIGHT,GBM,Grade IV,GTR,not done,NEGATIVE,not done,POSITIVE,60 Gy in 30#,not available,not available,not available
+Prof. Dr. Qamruzzaman Chowdhury,Alive,4.101369863013699,Male,24.155555555555555,2,FRONTAL,RIGHT,OLIGODENDROGLIOMA,Grade II,GTR,POSITIVE,POSITIVE,not done,not done,no RT,not available,not available,not available
+Prof. Dr. Qamruzzaman Chowdhury,Censored,4.632876712328767,Male,34.22777777777778,2,PARIETAL,RIGHT,ASTROCYTOMA,Grade II,STR,POSITIVE,not done,not done,not done,60 Gy in 30#,not available,not available,not available
+Prof. Dr. Qamruzzaman Chowdhury,Censored,5.115068493150685,Male,63.60833333333333,4,PARIETAL,RIGHT,GBM,Grade II,GTR,not done,not done,not done,not done,60 Gy in 30#,not available,not available,TMZ
+Dr. Md. Arifur Rahman,Dead,2.2356164383561645,Male,55.39166666666667,3,PARIETAL,RIGHT,GBM,Grade IV,GTR,not done,NEGATIVE,not done,not done,60 Gy in 30#,not available,not available,TMZ
+Prof. Dr. Qamruzzaman Chowdhury,Censored,3.665753424657534,Male,46.68055555555555,3,PARIETAL,LEFT,GBM,Grade IV,GTR,not done,not done,not done,POSITIVE,60 Gy in 30#,not available,not available,TMZ
+Prof. Dr. Qamruzzaman Chowdhury,Dead,0.7808219178082192,Male,63.330555555555556,4,FRONTO-TEMPORAL,LEFT,GBM,Grade IV,STR,not done,not done,not done,POSITIVE,60 Gy in 30#,not available,TMZ,TMZ
+Prof. Dr. Qamruzzaman Chowdhury,Dead,2.2,Male,58.21944444444444,3,TEMPORAL,LEFT,GBM,Grade IV,GTR,not done,not done,not done,POSITIVE,60 Gy in 30#,3DCRT,TMZ,TMZ
+Prof. Dr. Qamruzzaman Chowdhury,Dead,0.7808219178082192,Female,52.463888888888896,3,FRONTAL,RIGHT,GBM,Grade IV,GTR,not done,POSITIVE,not done,NEGATIVE,60 Gy in 30#,3DCRT,TMZ,not available
+Prof. Dr. Qamruzzaman Chowdhury,Censored,4.16986301369863,Male,10.525,1,FRONTO-PARIETAL,RIGHT,EPENDYMOMA,Grade III,GTR,not done,not done,not done,not done,no RT,not available,not available,not available
+Prof. Dr. Qamruzzaman Chowdhury,Censored,4.090410958904109,Male,55.06388888888889,3,FRONTO-PARIETAL,LEFT,GBM,Grade IV,GTR,not done,not done,not done,not done,60 Gy in 30#,3DCRT,TMZ,not available
+Dr. Md. Arifur Rahman,Dead,2.9945205479452053,Male,10.1,1,OCCIPITAL,CENTRAL,EPENDYMOMA,Grade III,GTR,not done,not done,not done,not done,no RT,not available,not available,TMZ
+Prof. Dr. Qamruzzaman Chowdhury,Dead,1.0054794520547945,Male,55.02222222222222,3,FRONTAL,RIGHT,GBM,Grade IV,GTR,POSITIVE,POSITIVE,not done,NEGATIVE,60 Gy in 30#,3DCRT,TMZ,X
+Prof. Dr. Qamruzzaman Chowdhury,Censored,4.043835616438356,Female,57.047222222222224,3,FRONTAL,RIGHT,GBM,Grade IV,GTR,POSITIVE,POSITIVE,not done,NEGATIVE,no RT,not available,not available,not available
+Prof. Dr. Qamruzzaman Chowdhury,Alive,3.936986301369863,Male,12.344444444444443,1,PARIETAL,LEFT,EPENDYMOMA,Grade II,GTR,POSITIVE,,not done,not done,no RT,not available,not available,not available
+Prof. Dr. Qamruzzaman Chowdhury,Dead,1.621917808219178,Male,59.98333333333333,3,FRONTAL,LEFT,GBM,Grade IV,GTR,not done,not done,not done,POSITIVE,59.4 Gy in 33#,IMRT,TMZ,not available
+Prof. Dr. Qamruzzaman Chowdhury,Dead,1.9972602739726026,Female,41.72777777777778,3,OCCIPITAL,RIGHT,GBM,Grade IV,GTR,not done,not done,not done,not done,60 Gy in 30#,not available,TMZ,TMZ
+Prof. Dr. Qamruzzaman Chowdhury,Alive,3.9205479452054797,Female,50.21944444444444,3,TEMPORAL,LEFT,GBM,Grade IV,GTR,POSITIVE,NEGATIVE,not done,X,59.4 Gy in 33#,IMRT,TMZ,not available
+Prof. Dr. Qamruzzaman Chowdhury,Dead,0.9671232876712329,Male,66.39999999999999,4,INSULAR,RIGHT,GBM,Grade IV,STR,POSITIVE,POSITIVE,not done,NEGATIVE,59.4 Gy in 33#,IMRT,TMZ,not available
+Prof. Dr. Qamruzzaman Chowdhury,Dead,1.2493150684931507,Female,43.69722222222222,3,PARIETAL,RIGHT,ASTROCYTOMA,Grade II,GTR,not done,not done,not done,POSITIVE,54 GY in 30#,not available,not available,not available
+Prof. Dr. Qamruzzaman Chowdhury,Dead,0.6136986301369863,Female,41.644444444444446,3,FRONTAL,RIGHT,ASTROCYTOMA,Grade II,GTR,POSITIVE,POSITIVE,not done,not done,60 Gy in 30#,not available,TMZ,not available
+Prof. Dr. Qamruzzaman Chowdhury,Alive,3.852054794520548,Female,40.38055555555555,3,FRONTAL,RIGHT,OLIGODENDROGLIOMA,Grade II,GTR,not done,POSITIVE,not done,not done,no RT,not available,not available,not available
+Prof. Dr. Qamruzzaman Chowdhury,Censored,6.638356164383562,Male,35.71944444444444,2,SPINAL,SPINAL,ASTROCYTOMA,Grade III,STR,not done,not done,not done,not done,60 Gy in 30#,not available,not available,not available
+Prof. Dr. Qamruzzaman Chowdhury,Censored,3.8,Female,57.39722222222222,3,PARIETO-OCCIPITAL,RIGHT,GBM,Grade IV,STR,POSITIVE,NEGATIVE,not done,not done,60 Gy in 30#,not available,TMZ,TMZ
+Prof. Dr. Qamruzzaman Chowdhury,Censored,3.780821917808219,Male,29.438888888888886,2,FRONTO-PARIETAL,RIGHT,ASTROCYTOMA,Grade III,STR,not done,POSITIVE,not done,not done,59.4 Gy in 33#,IMRT,TMZ,TMZ
+Prof. Dr. Qamruzzaman Chowdhury,Alive,3.8438356164383563,Female,12.225,1,OCCIPITAL,CENTRAL,ASTROCYTOMA,Grade II,GTR,POSITIVE,not done,not done,not done,no RT,not available,not available,not available
+Prof. Dr. Qamruzzaman Chowdhury,Alive,3.6684931506849314,Female,20.158333333333335,2,TEMPORO-PARIETAL,RIGHT,ASTROCYTOMA,Grade III,GTR,POSITIVE,not done,not done,POSITIVE,no RT,not available,not available,not available
+Prof. Dr. Qamruzzaman Chowdhury,Dead,0.12602739726027398,Male,71.99722222222222,4,THALAMIC,RIGHT,ASTROCYTOMA,Grade III,STR,not done,POSITIVE,not done,NEGATIVE,no RT,not available,not available,not available
+Prof. Dr. Qamruzzaman Chowdhury,Dead,0.8301369863013699,Male,49.94166666666666,3,FRONTAL,RIGHT,GBM,Grade IV,STR,POSITIVE,not done,not done,not done,no RT,not available,not available,not available
+Prof. Dr. Qamruzzaman Chowdhury,Censored,3.6767123287671235,Female,64.8638888888889,4,PARIETAL,LEFT,GBM,Grade IV,GTR,POSITIVE,NEGATIVE,not done,not done,60 Gy in 30#,IMRT,TMZ,TMZ
+Prof. Dr. Qamruzzaman Chowdhury,Dead,0.4684931506849315,Male,66.85000000000001,4,TEMPORAL,RIGHT,GBM,Grade IV,GTR,POSITIVE,NEGATIVE,not done,NEGATIVE,60 Gy in 30#,IMRT,TMZ,not available
+Dr. Md. Arifur Rahman,Censored,3.5726027397260274,Male,18.11111111111111,2,THALAMIC,RIGHT,ASTROCYTOMA,Grade III,NTR,POSITIVE,POSITIVE,not done,NEGATIVE,no RT,not available,not available,not available
+Prof. Dr. Qamruzzaman Chowdhury,Alive,5.158904109589041,Male,37.53055555555556,2,FRONTO-PARIETAL,LEFT,GBM,Grade IV,GTR,not done,not done,not done,NEGATIVE,60 Gy in 30#,not available,not available,TMZ
+Prof. Dr. Qamruzzaman Chowdhury,Censored,3.6410958904109587,Male,43.43333333333334,3,PARIETO-OCCIPITAL,RIGHT,GBM,Grade IV,GTR,POSITIVE,not done,not done,not done,no RT,not available,not available,not available
+Prof. Dr. Qamruzzaman Chowdhury,Censored,3.627397260273973,Male,56.644444444444446,3,OCCIPITAL,CENTRAL,GBM,Grade IV,GTR,not done,not done,not done,not done,no RT,not available,not available,not available
+Prof. Dr. Qamruzzaman Chowdhury,Censored,3.536986301369863,Female,61.64722222222222,4,FRONTO-TEMPORAL,LEFT,GBM,Grade IV,GTR,POSITIVE,POSITIVE,not done,POSITIVE,60 Gy in 30#,IMRT,TMZ,TMZ
+Dr. Md. Arifur Rahman,Censored,7.164383561643835,Female,34.208333333333336,2,FRONTAL,LEFT,GBM,Grade IV,STR,POSITIVE,NEGATIVE,not done,not done,60 Gy in 30#,not available,,TMZ
+Dr. Md. Arifur Rahman,Censored,7.7972602739726025,Male,46.35,3,PARIETAL,LEFT,ASTROCYTOMA,Grade II,GTR,not done,not done,not done,not done,60 Gy in 30#,not available,not available,TMZ
+Prof. Dr. Qamruzzaman Chowdhury,Dead,3.164383561643836,Male,34.538888888888884,2,PARIETAL,LEFT,GBM,Grade IV,GTR,not done,not done,not done,not done,54 GY in 30#,not available,not available,not available
+Dr. Md. Arifur Rahman,Censored,3.4767123287671233,Male,38.675000000000004,2,FRONTAL,RIGHT,ASTROCYTOMA,Grade II,NTR,POSITIVE,POSITIVE,not done,POSITIVE,54 GY in 30#,not available,TMZ,not available
+Prof. Dr. Qamruzzaman Chowdhury,Dead,0.4438356164383562,Female,62.68611111111111,4,TEMPORAL,RIGHT,GBM,Grade IV,NTR,POSITIVE,POSITIVE,not done,POSITIVE,no RT,not available,not available,not available
+Prof. Dr. Qamruzzaman Chowdhury,Alive,3.361643835616438,Female,13.777777777777779,1,OCCIPITAL,CENTRAL,ASTROCYTOMA,Grade III,GTR,not done,,not done,not done,no RT,not available,not available,not available
+Dr. Md. Arifur Rahman,Alive,2.967123287671233,Male,20.82777777777778,2,INSULAR,LEFT,ASTROCYTOMA,Grade II,STR,not done,POSITIVE,not done,not done,54 GY in 30#,not available,TMZ,TMZ
+Prof. Dr. Qamruzzaman Chowdhury,Alive,2.649315068493151,Male,34.51111111111111,2,PARIETAL,LEFT,OLIGODENDROGLIOMA,Grade III,GTR,not done,not done,not done,not done,60 Gy in 30#,not available,not available,not available
+Prof. Dr. Qamruzzaman Chowdhury,Dead,1.4876712328767123,Male,46.725,3,TEMPORAL,RIGHT,ASTROCYTOMA,Grade III,GTR,not done,not done,not done,not done,60 Gy in 30#,not available,not available,not available
+Prof. Dr. Qamruzzaman Chowdhury,Alive,3.115068493150685,Male,43.925000000000004,3,FRONTAL,LEFT,GBM,Grade IV,GTR,not done,not done,not done,not done,60 Gy in 30#,VMAT,not available,not available
+Prof. Dr. Qamruzzaman Chowdhury,Dead,0.08493150684931507,Male,14.880555555555555,1,SPINAL,SPINAL,GBM,Grade IV,STR,not done,not done,not done,not done,no RT,not available,not available,not available
+Prof. Dr. Qamruzzaman Chowdhury,Alive,3.0931506849315067,Male,27.605555555555554,2,OCCIPITAL,LEFT,GBM,Grade IV,GTR,not done,not done,not done,not done,no RT,not available,not available,not available
+Prof. Dr. Qamruzzaman Chowdhury,Censored,2.9808219178082194,Male,39.96666666666667,2,PARIETAL,RIGHT,GBM,Grade IV,GTR,not done,not done,not done,not done,60 Gy in 30#,not available,,TMZ
+Prof. Dr. Qamruzzaman Chowdhury,Dead,2.4164383561643836,Female,52.09444444444444,3,INSULAR,RIGHT,GBM,Grade IV,STR,POSITIVE,POSITIVE,not done,NEGATIVE,no RT,not available,not available,not available
+Prof. Dr. Qamruzzaman Chowdhury,Dead,4.515068493150685,Female,46.463888888888896,3,FRONTO-TEMPORAL,RIGHT,GBM,Grade IV,GTR,not done,not done,not done,POSITIVE,50 Gy in 25#,not available,not available,TMZ
+Dr. Md. Arifur Rahman,Censored,2.8383561643835615,Male,32.925000000000004,2,PARIETAL,LEFT,ASTROCYTOMA,Grade II,GTR,POSITIVE,POSITIVE,not done,not done,no RT,not available,not available,not available
+Dr. Md. Arifur Rahman,Censored,3.0136986301369864,Female,27.849999999999998,2,PARIETAL,RIGHT,ASTROCYTOMA,Grade II,GTR,not done,IDH1 MUTATED,not done,NEGATIVE,60 Gy in 30#,VMAT,not available,not available
+Dr. Md. Arifur Rahman,Censored,2.8164383561643835,Male,47.541666666666664,3,TEMPORO-OCCIPITAL,RIGHT,GBM,Grade IV,GTR,not done,not done,not done,not done,60 Gy in 30#,not available,,not available
+Dr. Ferdous Ara Begum,Alive,2.808219178082192,Male,15.986111111111112,1,SPINAL,SPINAL,EPENDYMOMA,Grade II,GTR,not done,not done,not done,not done,no RT,not available,not available,not available
+Dr. Md. Arifur Rahman,Alive,2.802739726027397,Female,35.10277777777778,2,CHOROIDAL,CENTRAL,EPENDYMOMA,Grade II,NTR,not done,not done,not done,not done,no RT,not available,not available,not available
+Dr. Md. Arifur Rahman,Alive,2.7643835616438355,Male,48.37777777777777,3,FRONTAL,RIGHT,OLIGODENDROGLIOMA,Grade II,GTR,not done,not done,not done,not done,44Gy in 22/30#,3DCRT,,not available
+Prof. Dr. Qamruzzaman Chowdhury,Censored,2.758904109589041,Male,43.838888888888896,3,FRONTAL,RIGHT,OLIGODENDROGLIOMA,Grade II,GTR,not done,POSITIVE,not done,POSITIVE,60 GY IN 30#,VMAT,TMZ,TMZ
+Prof. Dr. Qamruzzaman Chowdhury,Dead,1.841095890410959,Male,53.21111111111111,3,TEMPORAL,RIGHT,ASTROCYTOMA,Grade IV,GTR,POSITIVE,POSITIVE,not done,NEGATIVE,no RT,not available,not available,not available
+Prof. Dr. Qamruzzaman Chowdhury,Alive,2.824657534246575,Female,52.74444444444444,3,SPINAL,SPINAL,EPENDYMOMA,Grade II,GTR,not done,not done,not done,not done,no RT,not available,not available,not available
+Prof. Dr. Qamruzzaman Chowdhury,Dead,0.29315068493150687,Male,68.51388888888889,4,PARIETO-OCCIPITAL,RIGHT,GBM,Grade IV,STR,POSITIVE,NEGATIVE,not done,NEGATIVE,59.4 Gy in 33#,VMAT,not available,not available
+Dr. Md. Arifur Rahman,Censored,2.6684931506849314,Male,53.25555555555556,3,FRONTAL,LEFT,GBM,Grade IV,NTR,not done,not done,not done,not done,no RT,not available,not available,not available
+Dr. Md. Arifur Rahman,Censored,2.5753424657534247,Male,42.327777777777776,3,FRONTAL,RIGHT,OLIGODENDROGLIOMA,Grade II,NTR,not done,not done,not done,not done,no RT,not available,not available,not available
+Prof. Dr. Qamruzzaman Chowdhury,Alive,2.5452054794520547,Male,28.91111111111111,2,SPINAL,SPINAL,GBM,Grade IV,GTR,POSITIVE,NEGATIVE,not done,NEGATIVE,45 Gy in 25#,not available,not available,not available
+Dr. Md. Arifur Rahman,Censored,2.915068493150685,Male,30.95,2,TEMPORAL,RIGHT,ASTROCYTOMA,Grade IV,STERIOTACTIC BIOPSY ONLY,not done,POSITIVE,not done,not done,60 Gy in 30#,not available,TMZ,TMZ
+Prof. Dr. Qamruzzaman Chowdhury,Censored,2.682191780821918,Male,62.286111111111104,4,TEMPORAL,RIGHT,GBM,Grade IV,STR,not done,NEGATIVE,not done,POSITIVE,no RT,not available,not available,not available
+Prof. Dr. Qamruzzaman Chowdhury,Alive,2.5835616438356164,Male,48.044444444444444,3,FRONTAL,LEFT,ASTROCYTOMA,Grade II,GTR,POSITIVE,NEGATIVE,not done,not done,no RT,not available,not available,not available
+Prof. Dr. Qamruzzaman Chowdhury,Alive,2.4547945205479453,Male,44.50833333333333,3,OCCIPITAL,LEFT,EPENDYMOMA,Grade II,NTR,POSITIVE,,not done,not done,54 GY in 30#,not available,,not available
+Dr. Md. Arifur Rahman,Alive,2.5534246575342467,Male,12.941666666666668,1,TEMPORAL,RIGHT,GBM,Grade IV,STR,not done,not done,not done,not done,59.4 Gy in 33#,IMRT,,not available
+Prof. Dr. Qamruzzaman Chowdhury,Alive,6.2246575342465755,Female,17.144444444444442,1,SUPRASELLAR,CENTRAL,ASTROCYTOMA,Grade II,STR,POSITIVE,,not done,not done,54 GY in 30#,not available,,not available
+Dr. Md. Arifur Rahman,Dead,1.6082191780821917,Male,58.60833333333333,3,PARIETAL,RIGHT,GBM,Grade IV,GTR,not done,not done,not done,not done,no RT,not available,not available,not available
+Dr. Ferdous Ara Begum,Dead,0.7534246575342466,Male,72.34166666666667,4,TEMPORAL,RIGHT,GBM,Grade IV,STERIOTACTIC BIOPSY ONLY,not done,not done,not done,not done,no RT,not available,not available,not available
+Prof. Dr. Qamruzzaman Chowdhury,Dead,0.5561643835616439,Male,60.35277777777778,4,PARIETAL,LEFT,GBM,Grade IV,GTR,not done,not done,not done,not done,60 Gy in 30#,not available,TMZ,not available
+Prof. Dr. Qamruzzaman Chowdhury,Censored,2.2,Male,65.00833333333334,4,TEMPORAL,RIGHT,GBM,Grade IV,GTR,POSITIVE,NEGATIVE,not done,not done,no RT,not available,not available,not available
+Dr. Md. Arifur Rahman,Dead,2.0821917808219177,Female,57.111111111111114,3,FRONTAL,LEFT,OLIGODENDROGLIOMA,Grade III,GTR,not done,not done,not done,not done,59.4 Gy in 33#,VMAT,TMZ,TMZ
+Dr. Md. Arifur Rahman,Dead,1.367123287671233,Male,39.050000000000004,2,TEMPORAL,LEFT,GBM,Grade IV,GTR,POSITIVE,NEGATIVE,not done,NEGATIVE,59.4 Gy in 33#,not available,TMZ,TMZ
+Dr. Md. Arifur Rahman,Censored,2.0794520547945203,Male,50.24722222222223,3,SPINAL,SPINAL,EPENDYMOMA,Grade II,GTR,not done,not done,not done,not done,no RT,not available,not available,not available
+Dr. Md. Arifur Rahman,Alive,2.0602739726027397,Female,12.402777777777779,1,PARIETAL,LEFT,EPENDYMOMA,Grade III,GTR,not done,not done,not done,not done,no RT,not available,not available,not available
+Prof. Dr. Qamruzzaman Chowdhury,Dead,0.5178082191780822,Female,60.455555555555556,4,PARIETAL,LEFT,GBM,Grade IV,GTR,POSITIVE,NEGATIVE,not done,not done,no RT,not available,not available,not available
+Prof. Dr. Qamruzzaman Chowdhury,Alive,1.7561643835616438,Male,38.15833333333333,2,FRONTAL,LEFT,ASTROCYTOMA,Grade III,STR,POSITIVE,NEGATIVE,not done,not done,60 Gy in 30#,not available,TMZ,TMZ
+Dr. Ferdous Ara Begum,Dead,0.7698630136986301,Male,59.71111111111111,3,TEMPORO-PARIETAL,LEFT,GBM,Grade IV,STR,not done,NEGATIVE,not done,not done,60 Gy in 30#,not available,not available,TMZ
+Prof. Dr. Qamruzzaman Chowdhury,Dead,1.167123287671233,Male,56.702777777777776,3,TEMPORAL,RIGHT,GBM,Grade IV,GTR,not done,not done,not done,not done,59.4 Gy in 33#,IMRT,not available,not available
+Prof. Dr. Qamruzzaman Chowdhury,Alive,1.673972602739726,Female,43.036111111111104,3,TEMPORAL,RIGHT,ASTROCYTOMA,Grade III,NTR,POSITIVE,POSITIVE,not done,NEGATIVE,no RT,not available,not available,not available
+Prof. Dr. Qamruzzaman Chowdhury,Censored,1.5397260273972602,Male,67.7,4,FRONTAL,LEFT,GBM,Grade III,GTR,POSITIVE,POSITIVE,not done,not done,60 Gy in 30#,not available,not available,TMZ
+Prof. Dr. Qamruzzaman Chowdhury,Dead,0.33972602739726027,Male,64.40833333333333,4,OCCIPITAL,RIGHT,GBM,Grade IV,GTR,not done,not done,not done,not done,no RT,not available,not available,not available
+Prof. Dr. Qamruzzaman Chowdhury,Alive,1.4438356164383561,Male,43.02222222222222,3,PARIETAL,RIGHT,GBM,Grade IV,GTR,NEGATIVE,NEGATIVE,not done,NEGATIVE,no RT,not available,not available,not available
+Prof. Dr. Qamruzzaman Chowdhury,Alive,2.3068493150684932,Female,40.824999999999996,3,PARIETAL,LEFT,OLIGODENDROGLIOMA,Grade II,GTR,not done,not done,not done,not done,60 Gy in 30#,not available,not available,not available
+Prof. Dr. Qamruzzaman Chowdhury,Dead,0.6602739726027397,Female,61.15555555555556,4,TEMPORAL,RIGHT,GBM,Grade IV,GTR,not done,not done,not done,not done,no RT,not available,not available,not available
+Prof. Dr. Qamruzzaman Chowdhury,Censored,1.4273972602739726,Male,59.50277777777777,3,FRONTO-PARIETAL,LEFT,GBM,Grade IV,GTR,not done,not done,not done,not done,no RT,not available,not available,not available
+Prof. Dr. Qamruzzaman Chowdhury,Alive,1.356164383561644,Female,33.144444444444446,2,PARIETAL,RIGHT,GBM,Grade IV,GTR,not done,not done,not done,not done,no RT,not available,not available,not available
+Dr. Md. Arifur Rahman,Dead,1.2273972602739727,Male,50.93888888888889,3,TEMPORAL,RIGHT,ASTROCYTOMA,Grade II,STERIOTACTIC BIOPSY ONLY,not done,NEGATIVE,not done,not done,no RT,not available,not available,not available
+Prof. Dr. Qamruzzaman Chowdhury,Dead,0.9095890410958904,Male,46.975,3,FRONTO-TEMPORAL,RIGHT,GBM,Grade IV,STR,not done,NEGATIVE,not done,not done,60 Gy in 30#,not available,TMZ,TMZ
+Prof. Dr. Qamruzzaman Chowdhury,Censored,1.3205479452054794,Male,67.13333333333334,4,TEMPORAL,RIGHT,GBM,Grade IV,GTR,not done,not done,not done,not done,no RT,not available,not available,not available
+Prof. Dr. Qamruzzaman Chowdhury,Censored,1.5041095890410958,Female,55.975,3,FRONTAL,RIGHT,GBM,Grade IV,GTR,not done,not done,not done,not done,60 Gy in 30#,not available,,not available
+Prof. Dr. Qamruzzaman Chowdhury,Censored,1.3041095890410959,Male,77.21388888888889,4,INSULAR,RIGHT,GBM,Grade IV,GTR,not done,not done,not done,not done,no RT,not available,not available,not available
+Dr. Md. Arifur Rahman,Dead,0.22465753424657534,Male,62.47777777777778,4,TEMPORO-PARIETAL,LEFT,ASTROCYTOMA,Grade IV,NTR,not done,,not done,not done,no RT,not available,not available,not available
+Dr. Md. Arifur Rahman,Censored,1.7095890410958905,Male,38.68888888888889,2,PARIETAL,LEFT,GBM,Grade IV,GTR,not done,X,not done,X,59.4 Gy in 33#,not available,,TMZ
+Prof. Dr. Qamruzzaman Chowdhury,Dead,3.032876712328767,Male,49.98333333333333,3,TEMPORO-PARIETAL,RIGHT,GBM,Grade IV,STR,POSITIVE,not done,not done,not done,24 Gy in 12/30#,VMAT,not available,not available
+Dr. Md. Arifur Rahman,Censored,1.2410958904109588,Female,25.516666666666666,2,TEMPORO-PARIETAL,LEFT,ASTROCYTOMA,Grade IV,GTR,POSITIVE,POSITIVE,not done,not done,no RT,not available,not available,not available
+Dr. Md. Arifur Rahman,Censored,2.3315068493150686,Male,56.96666666666667,3,PARIETAL,LEFT,ASTROCYTOMA,Grade III,GTR,not done,not done,not done,not done,60 Gy in 30#,not available,not available,"TMZ upto January2023 (8 cycles)> Now on 2ndline with Irinotecan +Bevacizumab (India),C1D1received on 9.06.2023, C4completed on 22.07.2023"
+Prof. Dr. Qamruzzaman Chowdhury,Alive,3.334246575342466,Male,18.26111111111111,2,OCCIPITAL,CENTRAL,EPENDYMOMA,Grade II,STR,not done,not done,not done,not done,50 Gy in 25#,not available,not available,not available
+Prof. Dr. Qamruzzaman Chowdhury,Dead,0.2356164383561644,Male,60.49166666666667,4,PARIETAL,RIGHT,GBM,Grade IV,GTR,POSITIVE,NEGATIVE,not done,not done,60 Gy in 30#,not available,not available,not available
+Prof. Dr. Qamruzzaman Chowdhury,Dead,2.7753424657534245,Male,55.763888888888886,3,TEMPORO-PARIETAL,LEFT,GBM,Grade IV,GTR,not done,not done,not done,not done,60 Gy in 30#,not available,not available,TMZ
+Prof. Dr. Qamruzzaman Chowdhury,Alive,1.2356164383561643,Male,20.855555555555558,2,SPINAL,SPINAL,EPENDYMOMA,Grade II,GTR,not done,not done,not done,not done,no RT,not available,not available,not available
+Prof. Dr. Qamruzzaman Chowdhury,Dead,1.021917808219178,Female,43.19722222222222,3,PARIETAL,LEFT,GBM,Grade IV,GTR,not done,not done,not done,not done,60 Gy in 30#,not available,not available,TMZ
+Prof. Dr. Qamruzzaman Chowdhury,Alive,1.0246575342465754,Female,50.74166666666667,3,TEMPORAL,LEFT,GBM,Grade II,GTR,POSITIVE,NEGATIVE,not done,NEGATIVE,no RT,not available,not available,not available
+Dr. Md. Arifur Rahman,Alive,0.9616438356164384,Male,37.824999999999996,2,FRONTAL,RIGHT,ASTROCYTOMA,Grade III,GTR,not done,POSITIVE,not done,not done,60 Gy in 30#,not available,,not available
+Prof. Dr. Qamruzzaman Chowdhury,Censored,0.9643835616438357,Male,19.308333333333334,2,PARIETAL,LEFT,ASTROCYTOMA,Grade II,GTR,not done,not done,not done,not done,no RT,not available,not available,not available
+Prof. Dr. Qamruzzaman Chowdhury,Alive,2.7424657534246575,Male,60.62777777777777,4,FRONTO-PARIETAL,RIGHT,GBM,Grade IV,STR,not done,not done,not done,not done,60 Gy in 30#,not available,not available,TMZ On 2021
+Prof. Dr. Qamruzzaman Chowdhury,Alive,0.8273972602739726,Female,68.31944444444444,4,TEMPORAL,LEFT,GBM,Grade IV,GTR,POSITIVE,NEGATIVE,not done,not done,60 Gy in 30#,IMRT,not available,TMZ
+Dr. Md. Arifur Rahman,Censored,0.8849315068493151,Female,43.775,3,FRONTAL,RIGHT,GBM,Grade III,GTR,not done,POSITIVE,not done,not done,60 Gy in 30#,not available,TMZ,TMZ
+Prof. Dr. Qamruzzaman Chowdhury,Censored,7.093150684931507,Male,45.797222222222224,3,TEMPORO-PARIETAL,LEFT,GBM,Grade IV,GTR,not done,POSITIVE,not done,not done,60 Gy in 30#,not available,TMZ,TMZ
+Prof. Dr. Qamruzzaman Chowdhury,Censored,6.254794520547946,Male,33.72777777777778,2,INSULAR,RIGHT,ASTROCYTOMA,Grade III,STR,not done,POSITIVE,not done,not done,59.4 Gy in 33#,not available,not available,TMZ
+Prof. Dr. Qamruzzaman Chowdhury,Alive,5.326027397260274,Male,61.175000000000004,4,FRONTAL,RIGHT,OLIGODENDROGLIOMA,Grade III,GTR,not done,POSITIVE,not done,not done,no RT,not available,not available,not available
+Dr. Md. Arifur Rahman,Dead,0.6328767123287671,Female,57.03333333333333,3,TEMPORAL,RIGHT,GBM,Grade IV,GTR,POSITIVE,NEGATIVE,not done,not done,no RT,not available,not available,not available
+Prof. Dr. Qamruzzaman Chowdhury,Dead,2.2684931506849315,Female,63.916666666666664,4,TEMPORAL,LEFT,GBM,Grade IV,GTR,not done,not done,not done,not done,60 GY IN 30#,not available,TMZ,TMZ
+Prof. Dr. Qamruzzaman Chowdhury,Dead,4.263013698630137,Male,28.5,2,TEMPORAL,RIGHT,GBM,Grade IV,GTR,not done,not done,not done,NEGATIVE,54 GY in 30#,not available,,not available
+Prof. Dr. Qamruzzaman Chowdhury,Censored,5.7534246575342465,Male,31.208333333333332,2,TEMPORAL,LEFT,ASTROCYTOMA,Grade II,NTR,not done,not done,not done,not done,no RT,not available,not available,not available
+Prof. Dr. Qamruzzaman Chowdhury,Censored,5.7095890410958905,Male,35.43055555555556,2,CHIASMATIC,RIGHT,GBM,Grade IV,BIOPSY,not done,not done,not done,not done,59.4 Gy in 33#,not available,TMZ,TMZ
+Prof. Dr. Qamruzzaman Chowdhury,Censored,7.093150684931507,Male,42.708333333333336,3,TEMPORO-PARIETAL,LEFT,GBM,Grade IV,GTR,not done,not done,not done,POSITIVE,60 Gy in 30#,not available,TMZ,TMZ
+Prof. Dr. Qamruzzaman Chowdhury,Alive,1.936986301369863,Female,46.18055555555555,3,PARIETO-OCCIPITAL,RIGHT,GBM,Grade IV,BIOPSY,not done,NEGATIVE,not done,X,X,not available,X,X
+Prof. Dr. Qamruzzaman Chowdhury,Alive,2.282191780821918,Male,55.01666666666667,3,PARIETAL,RIGHT,GBM,Grade IV,GTR,POSITIVE,NEGATIVE,POSITIVE,POSITIVE,60 Gy in 30#,not available,TMZ,TMZ
+Prof. Dr. Qamruzzaman Chowdhury,Alive,1.8027397260273972,Male,57.56666666666666,3,TEMPORO-PARIETAL,RIGHT,GBM,Grade IV,GTR,not done,X,X,X,Post RT,?,not available,TMZ
+Dr. Md. Arifur Rahman,Dead,0.8986301369863013,Male,64.41388888888889,4,TEMPORAL,LEFT,GBM,Grade IV,GTR,not done,NEGATIVE,X,NEGATIVE,60 Gy in 30#,VMAT,TMZ,X
+Prof. Dr. Qamruzzaman Chowdhury,Censored,0.8794520547945206,Male,28.041666666666668,2,FRONTAL,RIGHT,ASTROCYTOMA,Grade II,GTR,not done,IDH1 MUTATED,X,X,54 GY IN 27#,VMAT,TMZ,TMZ
+Prof. Dr. Qamruzzaman Chowdhury,Censored,0.9616438356164384,Male,40.81388888888889,3,TEMPORO-PARIETAL,RIGHT,OLIGODENDROGLIOMA,Grade II,NTR,not done,IDH1 MUTATED,X,X,54 GY IN 27#,VMAT,TMZ,TMZ
+Prof. Dr. Qamruzzaman Chowdhury,Censored,3.9315068493150687,Female,70.57222222222222,4,FRONTAL,LEFT,GBM,Grade II,GTR,POSITIVE,IDH1 MUTATED,NEGATIVE,NEGATIVE,45 GY IN 25#,3DCRT,X,X
+Dr. Md. Arifur Rahman,Censored,3.813698630136986,Female,50.797222222222224,3,CEREBRUM,CENTRAL,ASTROCYTOMA,Grade II,STERIOTACTIC BIOPSY ONLY,POSITIVE,IDH1 MUTATED,NEGATIVE,POSITIVE,54 GY IN 30#,3DCRT,X,X
+Dr. Md. Arifur Rahman,Dead,0.8082191780821918,Male,62.161111111111104,4,OCCIPITAL,RIGHT,GBM,Grade IV,GTR,not done,X,X,X,54 GY IN 30#,VMAT,TMZ,TMZ
+Dr. Md. Arifur Rahman,Dead,1.4356164383561645,Female,51.81666666666666,3,FRONTAL,RIGHT,GBM,Grade IV,GTR,POSITIVE,NEGATIVE,NEGATIVE,NEGATIVE,60 GY IN 30#,VMAT,TMZ,TMZ
