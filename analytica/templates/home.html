@@ -129,7 +129,6 @@
             border: 1px solid #dee2e6;
             font-size: 14px;
             line-height: 1.4;
-        }
             margin: 15px 0;
         }
         .table-responsive {
@@ -171,13 +170,47 @@
             <div class="col-md-2 sidebar p-0">
                 <div class="p-3">
                     <h4 class="mb-4"><i class="fas fa-chart-line"></i> Analytica</h4>
+                    
+                    <!-- User Info -->
+                    <div class="mb-4 p-3" style="background: rgba(255,255,255,0.1); border-radius: 10px;">
+                        <div class="d-flex align-items-center mb-2">
+                            <i class="fas fa-user-circle fa-2x me-2"></i>
+                            <div>
+                                <strong>{{ user.username }}</strong>
+                                <br><small class="text-light">{{ user.email|default:"No email" }}</small>
+                            </div>
+                        </div>
+                        <div class="mt-2">
+                            <a href="{% url 'logout' %}" class="btn btn-sm btn-outline-light w-100">
+                                <i class="fas fa-sign-out-alt"></i> Logout
+                            </a>
+                        </div>
+                    </div>
+                    
                     <nav class="nav flex-column">
                         <a class="nav-link active" href="#"><i class="fas fa-home"></i> Dashboard</a>
                         <a class="nav-link" href="#"><i class="fas fa-upload"></i> Upload Data</a>
                         <a class="nav-link" href="#"><i class="fas fa-cogs"></i> Processing</a>
                         <a class="nav-link" href="#"><i class="fas fa-robot"></i> AI Chat</a>
                         <a class="nav-link" href="#"><i class="fas fa-chart-bar"></i> Analysis</a>
+                        <a class="nav-link" href="{% url 'subscription_plans' %}"><i class="fas fa-crown"></i> Plans</a>
+                        <a class="nav-link" href="{% url 'my_subscription' %}"><i class="fas fa-user"></i> My Subscription</a>
                     </nav>
+                    
+                    <!-- Token Usage Display -->
+                    <div class="mt-4 p-3" style="background: rgba(255,255,255,0.1); border-radius: 10px;">
+                        <h6 class="mb-3"><i class="fas fa-coins"></i> Token Usage</h6>
+                        <div id="tokenUsageDisplay">
+                            <div class="text-center">
+                                <small>Loading usage data...</small>
+                            </div>
+                        </div>
+                        <div class="mt-3">
+                            <a href="{% url 'token_dashboard' %}" class="btn btn-sm btn-outline-light w-100">
+                                <i class="fas fa-chart-line"></i> View Details
+                            </a>
+                        </div>
+                    </div>
                 </div>
             </div>
 
@@ -281,60 +314,86 @@
                     <p>Cleaning data, analyzing structure, and preparing for AI analysis...</p>
                 </div>
 
-                <!-- Analysis Results -->
-                {% if cleaned_dataset %}
-                <div class="card mb-4">
-                    <div class="card-header">
-                        <h5><i class="fas fa-chart-bar"></i> Analysis Results</h5>
-                    </div>
-                    <div class="card-body">
-                        <div class="analysis-results">
-                            <h6>Cleaning Report:</h6>
-                            <ul>
-                                <li><strong>Shape:</strong> {{ cleaned_dataset.shape.0 }} rows × {{ cleaned_dataset.shape.1 }} columns</li>
-                                <li><strong>Columns:</strong> {{ cleaned_dataset.columns|length }}</li>
-                                {% if cleaned_dataset.cleaning_report %}
-                                <li><strong>Missing Values:</strong> {{ cleaned_dataset.cleaning_report.cleaning_summary.total_missing_values }}</li>
-                                <li><strong>Duplicate Rows:</strong> {{ cleaned_dataset.cleaning_report.cleaning_summary.total_duplicate_rows }}</li>
-                                <li><strong>Numeric Columns:</strong> {{ cleaned_dataset.cleaning_report.cleaning_summary.numeric_columns|length }}</li>
-                                <li><strong>Categorical Columns:</strong> {{ cleaned_dataset.cleaning_report.cleaning_summary.categorical_columns|length }}</li>
-                                {% endif %}
-                            </ul>
-                        </div>
-                    </div>
-                </div>
-                {% endif %}
+                                 <!-- Analysis Results -->
+                 {% if cleaned_dataset %}
+                 <div class="card mb-4">
+                     <div class="card-header">
+                         <h5><i class="fas fa-chart-bar"></i> Analysis Results</h5>
+                     </div>
+                     <div class="card-body">
+                         <div class="analysis-results">
+                             <h6>Cleaning Report:</h6>
+                             <ul>
+                                 <li><strong>Shape:</strong> {{ cleaned_dataset.shape.0 }} rows × {{ cleaned_dataset.shape.1 }} columns</li>
+                                 <li><strong>Columns:</strong> {{ cleaned_dataset.columns|length }}</li>
+                                 {% if cleaned_dataset.cleaning_report %}
+                                 <li><strong>Missing Values:</strong> {{ cleaned_dataset.cleaning_report.cleaning_summary.total_missing_values }}</li>
+                                 <li><strong>Duplicate Rows:</strong> {{ cleaned_dataset.cleaning_report.cleaning_summary.total_duplicate_rows }}</li>
+                                 <li><strong>Numeric Columns:</strong> {{ cleaned_dataset.cleaning_report.cleaning_summary.numeric_columns|length }}</li>
+                                 <li><strong>Categorical Columns:</strong> {{ cleaned_dataset.cleaning_report.cleaning_summary.categorical_columns|length }}</li>
+                                 {% endif %}
+                             </ul>
+                             
+                             <!-- Pass to AI Button -->
+                             <button class="btn btn-primary mt-3" onclick="passToAI()" id="passToAIBtn">
+                                 <i class="fas fa-robot"></i> Pass to AI
+                             </button>
+                         </div>
+                     </div>
+                 </div>
+                 {% endif %}
             </div>
 
-            <!-- AI Chat Panel -->
-            <div class="col-md-4 chat-panel p-4">
-                <h4 class="mb-4"><i class="fas fa-robot"></i> AI Assistant</h4>
-                
-                <div class="chat-messages" id="chatMessages">
-                    <div class="message ai">
-                        <strong>AI Assistant:</strong> Hello! Upload a dataset and I'll analyze it for you. Ask me anything about your data.
-                    </div>
-                </div>
-                
-                <div class="input-group mt-3">
-                    <input type="text" class="form-control" id="chatInput" placeholder="Ask me about your dataset..." 
-                           {% if not cleaned_dataset %}disabled{% endif %}>
-                    <button class="btn btn-primary" type="button" onclick="sendMessage()" 
-                            {% if not cleaned_dataset %}disabled{% endif %}>
-                        <i class="fas fa-paper-plane"></i>
-                    </button>
-                </div>
-                
-                <div class="mt-3">
-                    <small class="text-muted">
-                        {% if cleaned_dataset %}
-                        <i class="fas fa-check-circle text-success"></i> Dataset ready for analysis
-                        {% else %}
-                        <i class="fas fa-exclamation-triangle text-warning"></i> Upload and process a dataset first
-                        {% endif %}
-                    </small>
-                </div>
-            </div>
+                         <!-- AI Chat Panel -->
+             <div class="col-md-4 chat-panel p-4">
+                 <h4 class="mb-4"><i class="fas fa-robot"></i> AI Assistant</h4>
+                 
+                 <!-- Dataset Info Display -->
+                 {% if ai_ready and file_info %}
+                 <div class="card mb-3">
+                     <div class="card-header">
+                         <h6><i class="fas fa-database"></i> Active Dataset</h6>
+                     </div>
+                     <div class="card-body">
+                         <p><strong>File:</strong> {{ file_info.original_name }}</p>
+                         <p><strong>Rows:</strong> {{ dataset_info.rows }}</p>
+                         <p><strong>Columns:</strong> {{ dataset_info.columns }}</p>
+                         <small class="text-success"><i class="fas fa-check-circle"></i> Data received and ready for analysis</small>
+                     </div>
+                 </div>
+                 {% endif %}
+                 
+                 <div class="chat-messages" id="chatMessages">
+                     <div class="message ai">
+                         {% if ai_ready %}
+                         <strong>AI Assistant:</strong> Hello! I have received your dataset "{{ file_info.original_name }}" with {{ dataset_info.rows }} rows and {{ dataset_info.columns }} columns. Ask me anything about your data!
+                         {% else %}
+                         <strong>AI Assistant:</strong> Hello! Upload a dataset and I'll analyze it for you. Ask me anything about your data.
+                         {% endif %}
+                     </div>
+                 </div>
+                 
+                 <div class="input-group mt-3">
+                     <input type="text" class="form-control" id="chatInput" placeholder="Ask me about your dataset..." 
+                            {% if not ai_ready %}disabled{% endif %}>
+                     <button class="btn btn-primary" type="button" onclick="sendMessage()" 
+                             {% if not ai_ready %}disabled{% endif %}>
+                         <i class="fas fa-paper-plane"></i>
+                     </button>
+                 </div>
+                 
+                 <div class="mt-3">
+                     <small class="text-muted">
+                         {% if ai_ready %}
+                         <i class="fas fa-check-circle text-success"></i> AI ready for analysis
+                         {% elif cleaned_dataset %}
+                         <i class="fas fa-exclamation-triangle text-warning"></i> Click "Pass to AI" to enable chat
+                         {% else %}
+                         <i class="fas fa-exclamation-triangle text-warning"></i> Upload and process a dataset first
+                         {% endif %}
+                     </small>
+                 </div>
+             </div>
         </div>
     </div>
 
@@ -384,41 +443,164 @@
             }
         });
 
-        // Process dataset function
-        function processDataset() {
-            const processBtn = document.getElementById('processBtn');
-            const processingStatus = document.getElementById('processingStatus');
-            
-            processBtn.disabled = true;
-            processBtn.innerHTML = '<i class="fas fa-spinner fa-spin"></i> Processing...';
-            processingStatus.style.display = 'block';
-            
-            fetch('{% url "process_dataset" %}', {
-                method: 'POST',
-                headers: {
-                    'Content-Type': 'application/json',
-                    'X-CSRFToken': document.querySelector('[name=csrfmiddlewaretoken]').value,
-                }
-            })
-            .then(response => response.json())
-            .then(data => {
-                if (data.success) {
-                    processingStatus.innerHTML = '<h6><i class="fas fa-check-circle text-success"></i> Processing Complete!</h6><p>Dataset has been cleaned and is ready for AI analysis.</p>';
-                    setTimeout(() => {
-                        location.reload();
-                    }, 2000);
-                } else {
-                    processingStatus.innerHTML = '<h6><i class="fas fa-exclamation-triangle text-danger"></i> Processing Failed</h6><p>' + (data.error || 'Unknown error occurred') + '</p>';
-                }
-            })
-            .catch(error => {
-                processingStatus.innerHTML = '<h6><i class="fas fa-exclamation-triangle text-danger"></i> Processing Failed</h6><p>Network error occurred. Please try again.</p>';
-            })
-            .finally(() => {
-                processBtn.disabled = false;
-                processBtn.innerHTML = '<i class="fas fa-cogs"></i> Process Dataset';
-            });
+                 // Process dataset function
+         function processDataset() {
+             const processBtn = document.getElementById('processBtn');
+             const processingStatus = document.getElementById('processingStatus');
+             
+             processBtn.disabled = true;
+             processBtn.innerHTML = '<i class="fas fa-spinner fa-spin"></i> Processing...';
+             processingStatus.style.display = 'block';
+             
+             fetch('{% url "process_dataset" %}', {
+                 method: 'POST',
+                 headers: {
+                     'Content-Type': 'application/json',
+                     'X-CSRFToken': document.querySelector('[name=csrfmiddlewaretoken]').value,
+                 }
+             })
+             .then(response => response.json())
+             .then(data => {
+                 if (data.success) {
+                     processingStatus.innerHTML = '<h6><i class="fas fa-check-circle text-success"></i> Processing Complete!</h6><p>Dataset has been cleaned and is ready for AI analysis.</p>';
+                     setTimeout(() => {
+                         location.reload();
+                     }, 2000);
+                 } else {
+                     processingStatus.innerHTML = '<h6><i class="fas fa-exclamation-triangle text-danger"></i> Processing Failed</h6><p>' + (data.error || 'Unknown error occurred') + '</p>';
+                 }
+             })
+             .catch(error => {
+                 processingStatus.innerHTML = '<h6><i class="fas fa-exclamation-triangle text-danger"></i> Processing Failed</h6><p>Network error occurred. Please try again.</p>';
+             })
+             .finally(() => {
+                 processBtn.disabled = false;
+                 processBtn.innerHTML = '<i class="fas fa-cogs"></i> Process Dataset';
+             });
+         }
+         
+                 // Load token usage data
+        function loadTokenUsage() {
+            fetch('{% url "api_token_usage" %}')
+                .then(response => response.json())
+                .then(data => {
+                    if (data.success && data.usage_summary) {
+                        const display = document.getElementById('tokenUsageDisplay');
+                        display.innerHTML = `
+                            <div class="text-center">
+                                <div class="mb-2">
+                                    <strong>${data.usage_summary.total_questions}</strong> questions
+                                </div>
+                                <div class="mb-2">
+                                    <strong>${data.usage_summary.total_tokens.toLocaleString()}</strong> tokens
+                                </div>
+                                <div class="mb-2">
+                                    <strong>৳${data.usage_summary.total_cost_bdt.toFixed(2)}</strong> spent
+                                </div>
+                            </div>
+                        `;
+                    } else {
+                        document.getElementById('tokenUsageDisplay').innerHTML = `
+                            <div class="text-center">
+                                <small>No usage data available</small>
+                            </div>
+                        `;
+                    }
+                })
+                .catch(error => {
+                    console.error('Error loading token usage:', error);
+                    document.getElementById('tokenUsageDisplay').innerHTML = `
+                        <div class="text-center">
+                            <small>Error loading data</small>
+                        </div>
+                    `;
+                });
         }
+
+        // Load token usage on page load
+        document.addEventListener('DOMContentLoaded', function() {
+            loadTokenUsage();
+        });
+
+        // Pass to AI function
+        function passToAI() {
+             const passBtn = document.getElementById('passToAIBtn');
+             
+             passBtn.disabled = true;
+             passBtn.innerHTML = '<i class="fas fa-spinner fa-spin"></i> Passing to AI...';
+             
+             fetch('{% url "pass_to_ai" %}', {
+                 method: 'POST',
+                 headers: {
+                     'Content-Type': 'application/json',
+                     'X-CSRFToken': document.querySelector('[name=csrfmiddlewaretoken]').value,
+                 }
+             })
+             .then(response => response.json())
+             .then(data => {
+                 if (data.success) {
+                     passBtn.innerHTML = '<i class="fas fa-check-circle"></i> Passed to AI';
+                     passBtn.className = 'btn btn-success mt-3';
+                     
+                     // Update chat messages
+                     const chatMessages = document.getElementById('chatMessages');
+                     chatMessages.innerHTML = `
+                         <div class="message ai">
+                             <strong>AI Assistant:</strong> Hello! I have received your dataset "${data.dataset_name}" with ${data.rows} rows and ${data.columns} columns. Ask me anything about your data!
+                         </div>
+                     `;
+                     
+                     // Enable chat input
+                     document.getElementById('chatInput').disabled = false;
+                     document.querySelector('button[onclick="sendMessage()"]').disabled = false;
+                     
+                     // Update status message
+                     const statusElement = document.querySelector('.mt-3 small');
+                     if (statusElement) {
+                         statusElement.innerHTML = '<i class="fas fa-check-circle text-success"></i> AI ready for analysis';
+                     }
+                     
+                     // Add dataset info card
+                     const chatPanel = document.querySelector('.chat-panel');
+                     const existingCard = chatPanel.querySelector('.card');
+                     if (!existingCard) {
+                         const datasetCard = document.createElement('div');
+                         datasetCard.className = 'card mb-3';
+                         datasetCard.innerHTML = `
+                             <div class="card-header">
+                                 <h6><i class="fas fa-database"></i> Active Dataset</h6>
+                             </div>
+                             <div class="card-body">
+                                 <p><strong>File:</strong> ${data.dataset_name}</p>
+                                 <p><strong>Rows:</strong> ${data.rows}</p>
+                                 <p><strong>Columns:</strong> ${data.columns}</p>
+                                 <small class="text-success"><i class="fas fa-check-circle"></i> Data received and ready for analysis</small>
+                             </div>
+                         `;
+                         chatPanel.insertBefore(datasetCard, chatPanel.querySelector('.chat-messages'));
+                     }
+                     
+                 } else {
+                     passBtn.innerHTML = '<i class="fas fa-exclamation-triangle"></i> Failed';
+                     passBtn.className = 'btn btn-danger mt-3';
+                     setTimeout(() => {
+                         passBtn.innerHTML = '<i class="fas fa-robot"></i> Pass to AI';
+                         passBtn.className = 'btn btn-primary mt-3';
+                         passBtn.disabled = false;
+                     }, 3000);
+                 }
+             })
+             .catch(error => {
+                 console.error('Pass to AI Error:', error);
+                 passBtn.innerHTML = '<i class="fas fa-exclamation-triangle"></i> Failed';
+                 passBtn.className = 'btn btn-danger mt-3';
+                 setTimeout(() => {
+                     passBtn.innerHTML = '<i class="fas fa-robot"></i> Pass to AI';
+                     passBtn.className = 'btn btn-primary mt-3';
+                     passBtn.disabled = false;
+                 }, 3000);
+             });
+         }
 
         // Chat functionality
         function addMessage(sender, message) {
@@ -471,8 +653,25 @@
                 formattedMessage = formattedMessage.replace(/\*(.+?)\*/g, '<em>$1</em>');
                 
                 // Format ASCII charts with better styling
-                // Bar charts with █ characters
-                formattedMessage = formattedMessage.replace(/([^:]+): (█+)/g, function(match, label, bars) {
+                // First, clean up any HTML/CSS that might be embedded in the chart strings
+                formattedMessage = formattedMessage.replace(/font-family:\s*monospace;\s*background:\s*#[a-fA-F0-9]+;\s*padding:\s*\d+px;\s*border-radius:\s*\d+px;/g, '');
+                formattedMessage = formattedMessage.replace(/style="[^"]*"/g, '');
+                
+                // Enhanced bar charts with █ characters - more flexible pattern
+                formattedMessage = formattedMessage.replace(/([^:]+):\s*(█+)\s*\((\d+)\)/g, function(match, label, bars, count) {
+                    const percentage = Math.round((bars.length / 20) * 100);
+                    return `<div class="chart-container mb-2">
+                        <div class="chart-label">${label}:</div>
+                        <div class="chart-bar">
+                            <div class="chart-fill" style="width: ${percentage}%; background: linear-gradient(90deg, #667eea, #764ba2);">
+                                ${bars} (${count})
+                            </div>
+                        </div>
+                    </div>`;
+                });
+                
+                // Simple bar charts without count (kept for backward compatibility or simpler patterns)
+                formattedMessage = formattedMessage.replace(/([^:]+):\s*(█+)/g, function(match, label, bars) {
                     const percentage = Math.round((bars.length / 20) * 100);
                     return `<div class="chart-container mb-2">
                         <div class="chart-label">${label}:</div>
@@ -513,6 +712,9 @@
                         </div>
                     </div>`;
                 });
+                
+                // Debug: Log any remaining chart patterns
+                console.log('Formatted message:', formattedMessage);
                 
                 messageDiv.innerHTML = `<strong>AI Assistant:</strong> ${formattedMessage}`;
             }

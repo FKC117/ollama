@@ -1,0 +1,355 @@
+{% extends 'base.html' %}
+{% load static %}
+
+{% block title %}Token Usage Dashboard{% endblock %}
+
+{% block extra_css %}
+<style>
+    .usage-card {
+        background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+        color: white;
+        border-radius: 15px;
+        padding: 20px;
+        margin-bottom: 20px;
+        box-shadow: 0 4px 15px rgba(0,0,0,0.1);
+    }
+    
+    .usage-stat {
+        text-align: center;
+        padding: 15px;
+        background: rgba(255,255,255,0.1);
+        border-radius: 10px;
+        margin: 10px 0;
+    }
+    
+    .usage-stat h3 {
+        font-size: 2rem;
+        margin: 0;
+        font-weight: bold;
+    }
+    
+    .usage-stat p {
+        margin: 5px 0 0 0;
+        opacity: 0.9;
+    }
+    
+    .chart-container {
+        background: white;
+        border-radius: 15px;
+        padding: 20px;
+        margin: 20px 0;
+        box-shadow: 0 4px 15px rgba(0,0,0,0.1);
+    }
+    
+    .subscription-card {
+        background: white;
+        border-radius: 15px;
+        padding: 20px;
+        margin: 20px 0;
+        box-shadow: 0 4px 15px rgba(0,0,0,0.1);
+        border-left: 5px solid #667eea;
+    }
+    
+    .progress-bar {
+        height: 10px;
+        background: #e9ecef;
+        border-radius: 5px;
+        overflow: hidden;
+        margin: 10px 0;
+    }
+    
+    .progress-fill {
+        height: 100%;
+        background: linear-gradient(90deg, #667eea, #764ba2);
+        transition: width 0.3s ease;
+    }
+    
+    .tier-badge {
+        display: inline-block;
+        padding: 5px 15px;
+        border-radius: 20px;
+        font-size: 0.9rem;
+        font-weight: bold;
+        text-transform: uppercase;
+    }
+    
+    .tier-free { background: #28a745; color: white; }
+    .tier-basic { background: #007bff; color: white; }
+    .tier-premium { background: #6f42c1; color: white; }
+    .tier-enterprise { background: #dc3545; color: white; }
+    
+    .cost-breakdown {
+        background: #f8f9fa;
+        border-radius: 10px;
+        padding: 15px;
+        margin: 15px 0;
+    }
+    
+    .cost-item {
+        display: flex;
+        justify-content: space-between;
+        padding: 8px 0;
+        border-bottom: 1px solid #dee2e6;
+    }
+    
+    .cost-item:last-child {
+        border-bottom: none;
+        font-weight: bold;
+    }
+</style>
+{% endblock %}
+
+{% block content %}
+<div class="container-fluid">
+    <div class="row">
+        <div class="col-12">
+            <div class="d-flex justify-content-between align-items-center mb-4">
+                <h1><i class="fas fa-chart-line"></i> Token Usage Dashboard</h1>
+                <a href="{% url 'home' %}" class="btn btn-outline-primary">
+                    <i class="fas fa-arrow-left"></i> Back to Analysis
+                </a>
+            </div>
+        </div>
+    </div>
+
+    {% if error %}
+    <div class="alert alert-danger">
+        <i class="fas fa-exclamation-triangle"></i> {{ error }}
+    </div>
+    {% endif %}
+
+    <!-- Usage Summary Cards -->
+    {% if usage_summary %}
+    <div class="row">
+        <div class="col-md-3">
+            <div class="usage-card">
+                <div class="usage-stat">
+                    <h3>{{ usage_summary.total_questions }}</h3>
+                    <p>Questions Asked</p>
+                </div>
+            </div>
+        </div>
+        <div class="col-md-3">
+            <div class="usage-card">
+                <div class="usage-stat">
+                    <h3>{{ usage_summary.total_tokens|floatformat:0 }}</h3>
+                    <p>Total Tokens Used</p>
+                </div>
+            </div>
+        </div>
+        <div class="col-md-3">
+            <div class="usage-card">
+                <div class="usage-stat">
+                    <h3>${{ usage_summary.total_cost_usd|floatformat:4 }}</h3>
+                    <p>Total Cost (USD)</p>
+                </div>
+            </div>
+        </div>
+        <div class="col-md-3">
+            <div class="usage-card">
+                <div class="usage-stat">
+                    <h3>৳{{ usage_summary.total_cost_bdt|floatformat:2 }}</h3>
+                    <p>Total Cost (BDT)</p>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Detailed Usage Statistics -->
+    <div class="row">
+        <div class="col-md-6">
+            <div class="chart-container">
+                <h4><i class="fas fa-chart-pie"></i> Token Breakdown</h4>
+                <div class="cost-breakdown">
+                    <div class="cost-item">
+                        <span>Input Tokens:</span>
+                        <span>{{ usage_summary.total_input_tokens|floatformat:0 }}</span>
+                    </div>
+                    <div class="cost-item">
+                        <span>Output Tokens:</span>
+                        <span>{{ usage_summary.total_output_tokens|floatformat:0 }}</span>
+                    </div>
+                    <div class="cost-item">
+                        <span>Average per Question:</span>
+                        <span>{{ usage_summary.average_tokens_per_question|floatformat:0 }}</span>
+                    </div>
+                </div>
+            </div>
+        </div>
+        <div class="col-md-6">
+            <div class="chart-container">
+                <h4><i class="fas fa-dollar-sign"></i> Cost Breakdown</h4>
+                <div class="cost-breakdown">
+                    <div class="cost-item">
+                        <span>Average Cost per Question (USD):</span>
+                        <span>${{ usage_summary.average_cost_per_question_usd|floatformat:6 }}</span>
+                    </div>
+                    <div class="cost-item">
+                        <span>Average Cost per Question (BDT):</span>
+                        <span>৳{{ usage_summary.average_cost_per_question_bdt|floatformat:2 }}</span>
+                    </div>
+                    <div class="cost-item">
+                        <span>Exchange Rate:</span>
+                        <span>1 USD = ৳117.50</span>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+    {% endif %}
+
+    <!-- Subscription Information -->
+    {% if subscription_info %}
+    <div class="row">
+        <div class="col-12">
+            <div class="subscription-card">
+                <div class="d-flex justify-content-between align-items-center">
+                    <div>
+                        <h4><i class="fas fa-user-tag"></i> Subscription Status</h4>
+                        <p class="mb-2">
+                            <span class="tier-badge tier-{{ subscription_info.tier }}">
+                                {{ subscription_info.get_tier_display }}
+                            </span>
+                        </p>
+                    </div>
+                    <div class="text-right">
+                        <h5>Monthly Usage</h5>
+                        <p class="mb-1">{{ subscription_info.current_month_tokens_used|floatformat:0 }} / {{ subscription_info.monthly_token_limit|floatformat:0 }} tokens</p>
+                        <div class="progress-bar">
+                            <div class="progress-fill" style="width: {{ subscription_info.get_usage_percentage }}%"></div>
+                        </div>
+                        <small>{{ subscription_info.get_usage_percentage|floatformat:1 }}% used</small>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+    {% endif %}
+
+    <!-- Usage Charts -->
+    {% if chart_data %}
+    <div class="row">
+        <div class="col-12">
+            <div class="chart-container">
+                <h4><i class="fas fa-chart-area"></i> Daily Usage Trends</h4>
+                <canvas id="usageChart" width="400" height="200"></canvas>
+            </div>
+        </div>
+    </div>
+    {% endif %}
+
+    <!-- Subscription Tiers -->
+    <div class="row">
+        <div class="col-12">
+            <div class="chart-container">
+                <h4><i class="fas fa-crown"></i> Available Plans</h4>
+                <div class="row">
+                    {% for tier_key, tier_info in subscription_tiers.items %}
+                    <div class="col-md-3">
+                        <div class="card h-100">
+                            <div class="card-header text-center">
+                                <h5 class="mb-0">{{ tier_info.name }}</h5>
+                            </div>
+                            <div class="card-body">
+                                <h3 class="text-center mb-3">৳{{ tier_info.monthly_cost_bdt|floatformat:0 }}/month</h3>
+                                <p class="text-center mb-3">{{ tier_info.monthly_token_limit|floatformat:0 }} tokens/month</p>
+                                <ul class="list-unstyled">
+                                    {% for feature in tier_info.features %}
+                                    <li><i class="fas fa-check text-success"></i> {{ feature }}</li>
+                                    {% endfor %}
+                                </ul>
+                            </div>
+                            <div class="card-footer text-center">
+                                <button class="btn btn-primary btn-sm">Upgrade</button>
+                            </div>
+                        </div>
+                    </div>
+                    {% endfor %}
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}
+
+{% block extra_js %}
+<script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+<script>
+document.addEventListener('DOMContentLoaded', function() {
+    // Usage Chart
+    {% if chart_data %}
+    const ctx = document.getElementById('usageChart').getContext('2d');
+    const usageChart = new Chart(ctx, {
+        type: 'line',
+        data: {
+            labels: {{ chart_data.dates|safe }},
+            datasets: [{
+                label: 'Questions Asked',
+                data: {{ chart_data.questions|safe }},
+                borderColor: '#667eea',
+                backgroundColor: 'rgba(102, 126, 234, 0.1)',
+                tension: 0.4
+            }, {
+                label: 'Tokens Used',
+                data: {{ chart_data.tokens|safe }},
+                borderColor: '#764ba2',
+                backgroundColor: 'rgba(118, 75, 162, 0.1)',
+                tension: 0.4,
+                yAxisID: 'y1'
+            }]
+        },
+        options: {
+            responsive: true,
+            interaction: {
+                mode: 'index',
+                intersect: false,
+            },
+            scales: {
+                x: {
+                    display: true,
+                    title: {
+                        display: true,
+                        text: 'Date'
+                    }
+                },
+                y: {
+                    type: 'linear',
+                    display: true,
+                    position: 'left',
+                    title: {
+                        display: true,
+                        text: 'Questions'
+                    }
+                },
+                y1: {
+                    type: 'linear',
+                    display: true,
+                    position: 'right',
+                    title: {
+                        display: true,
+                        text: 'Tokens'
+                    },
+                    grid: {
+                        drawOnChartArea: false,
+                    },
+                }
+            }
+        }
+    });
+    {% endif %}
+
+    // Auto-refresh usage data every 30 seconds
+    setInterval(function() {
+        fetch('{% url "api_token_usage" %}')
+            .then(response => response.json())
+            .then(data => {
+                if (data.success) {
+                    // Update usage statistics
+                    console.log('Usage data updated:', data.usage_summary);
+                }
+            })
+            .catch(error => console.error('Error updating usage data:', error));
+    }, 30000);
+});
+</script>
+{% endblock %} 

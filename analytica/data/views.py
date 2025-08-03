@@ -1,6 +1,11 @@
 from django.shortcuts import render, redirect
 from django.contrib import messages
 from django.http import JsonResponse
+from django.contrib.auth import authenticate, login, logout
+from django.contrib.auth.decorators import login_required
+from django.contrib.auth.forms import UserCreationForm
+from django.contrib import auth
+from .models import SubscriptionPlan, UserSubscription
 import os
 import pandas as pd
 from datetime import datetime
@@ -8,11 +13,115 @@ import json
 import requests
 import time
 import google.generativeai as genai
+from .token_utils import estimate_tokens, track_token_usage, get_user_usage_summary, get_daily_usage_chart_data, check_user_token_limit, get_subscription_tiers
 
 # Configure Gemini API
 genai.configure(api_key="AIzaSyBa8X7pjpMQFwn5OkzrW4IvSKGMECJWd44")
 
+# Authentication Views
+def login_view(request):
+    if request.user.is_authenticated:
+        return redirect('home')
+    
+    if request.method == 'POST':
+        username = request.POST.get('username')
+        password = request.POST.get('password')
+        user = authenticate(request, username=username, password=password)
+        
+        if user is not None:
+            login(request, user)
+            messages.success(request, f'Welcome back, {user.username}!')
+            return redirect('home')
+        else:
+            messages.error(request, 'Invalid username or password.')
+    
+    return render(request, 'auth/login.html')
+
+def register_view(request):
+    if request.user.is_authenticated:
+        return redirect('home')
+    
+    if request.method == 'POST':
+        form = UserCreationForm(request.POST)
+        if form.is_valid():
+            user = form.save()
+            login(request, user)
+            messages.success(request, f'Account created successfully! Welcome, {user.username}!')
+            return redirect('home')
+        else:
+            for field, errors in form.errors.items():
+                for error in errors:
+                    messages.error(request, f'{field}: {error}')
+    else:
+        form = UserCreationForm()
+    
+    return render(request, 'auth/register.html', {'form': form})
+
+def logout_view(request):
+    logout(request)
+    messages.success(request, 'You have been logged out successfully.')
+    return redirect('login')
+
+# Subscription Views
+@login_required(login_url='login')
+def subscription_plans(request):
+    """Display available subscription plans"""
+    plans = SubscriptionPlan.objects.filter(is_active=True)
+    user_subscription, created = UserSubscription.objects.get_or_create(
+        user=request.user,
+        defaults={'monthly_token_limit': 10000, 'monthly_cost_bdt': 0.0}
+    )
+    
+    context = {
+        'plans': plans,
+        'user_subscription': user_subscription,
+    }
+    return render(request, 'subscription/plans.html', context)
+
+@login_required(login_url='login')
+def select_plan(request, plan_id):
+    """Select a subscription plan for the user"""
+    try:
+        plan = SubscriptionPlan.objects.get(id=plan_id, is_active=True)
+        user_subscription, created = UserSubscription.objects.get_or_create(
+            user=request.user,
+            defaults={'monthly_token_limit': 10000, 'monthly_cost_bdt': 0.0}
+        )
+        
+        # Update user subscription
+        user_subscription.plan = plan
+        user_subscription.monthly_token_limit = plan.monthly_token_limit
+        user_subscription.monthly_cost_bdt = plan.monthly_cost_bdt
+        user_subscription.current_month_tokens_used = 0  # Reset usage
+        user_subscription.reset_date = datetime.now().date()
+        user_subscription.save()
+        
+        messages.success(request, f'Successfully subscribed to {plan.display_name}!')
+        return redirect('subscription_plans')
+        
+    except SubscriptionPlan.DoesNotExist:
+        messages.error(request, 'Selected plan not found.')
+        return redirect('subscription_plans')
+
+@login_required(login_url='login')
+def my_subscription(request):
+    """Display user's current subscription details"""
+    user_subscription, created = UserSubscription.objects.get_or_create(
+        user=request.user,
+        defaults={'monthly_token_limit': 10000, 'monthly_cost_bdt': 0.0}
+    )
+    
+    # Get usage summary
+    usage_summary = get_user_usage_summary(request.user)
+    
+    context = {
+        'user_subscription': user_subscription,
+        'usage_summary': usage_summary,
+    }
+    return render(request, 'subscription/my_subscription.html', context)
+
 # Create your views here.
+@login_required(login_url='login')
 def home(request):
     """Unified home view that handles file upload, processing, and analysis"""
     context = {
@@ -20,7 +129,8 @@ def home(request):
         'dataset_processed': False,
         'file_info': None,
         'dataset_info': None,
-        'cleaned_dataset': None
+        'cleaned_dataset': None,
+        'ai_ready': False
     }
     
     if request.method == 'POST':
@@ -91,17 +201,55 @@ def home(request):
                     # Store dataset info in session
                     request.session['dataset_info'] = dataset_info
                     
-                    # Update context for immediate display
-                    context.update({
-                        'file_uploaded': True,
-                        'file_info': request.session['uploaded_file'],
-                        'dataset_info': dataset_info
-                    })
-                    
-                    messages.success(request, f'File "{uploaded_file.name}" uploaded successfully!')
-                    
-                    # Redirect to prevent POST resubmission
-                    return redirect('home')
+                    # Automatically process the dataset
+                    try:
+                        from .cleaning import clean_and_prepare_dataset
+                        
+                        # Clean and prepare the dataset
+                        cleaned_df, cleaning_report = clean_and_prepare_dataset(file_path)
+                        
+                        if cleaned_df is not None:
+                            # Cache the cleaned data in session for AI chat
+                            request.session['cached_cleaned_data'] = {
+                                'shape': list(cleaned_df.shape),
+                                'columns': [str(col) for col in cleaned_df.columns],
+                                'data_types': {str(k): str(v) for k, v in cleaned_df.dtypes.to_dict().items()},
+                                'sample_data': cleaned_df.head(10).to_dict('records'),
+                                'summary_stats': cleaned_df.describe().to_dict(),
+                                'missing_values': cleaned_df.isnull().sum().to_dict(),
+                                'cleaning_report': cleaning_report,
+                                # Add actual data for AI analysis - send first 500 rows or entire dataset if smaller
+                                'full_data': cleaned_df.to_dict('records'),  # All rows for analysis
+                                'value_counts': {col: cleaned_df[col].value_counts().to_dict() for col in cleaned_df.columns}
+                            }
+                            
+                            # Store cleaned dataset info
+                            request.session['cleaned_dataset'] = {
+                                'shape': list(cleaned_df.shape),  # Convert tuple to list
+                                'columns': [str(col) for col in cleaned_df.columns],  # Convert to strings
+                                'cleaning_report': cleaning_report
+                            }
+                            
+                            # Update context for immediate display
+                            context.update({
+                                'file_uploaded': True,
+                                'file_info': request.session['uploaded_file'],
+                                'dataset_info': dataset_info,
+                                'dataset_processed': True,
+                                'cleaned_dataset': request.session['cleaned_dataset']
+                            })
+                            
+                            messages.success(request, f'File "{uploaded_file.name}" uploaded and processed successfully!')
+                            
+                            # Redirect to prevent POST resubmission
+                            return redirect('home')
+                        else:
+                            messages.error(request, 'Failed to process dataset')
+                            return render(request, 'home.html', context)
+                            
+                    except Exception as e:
+                        messages.error(request, f'Error processing dataset: {str(e)}')
+                        return render(request, 'home.html', context)
                     
                 except Exception as e:
                     messages.error(request, f'Error reading dataset: {str(e)}')
@@ -125,7 +273,43 @@ def home(request):
         if 'dataset_info' in request.session:
             context['dataset_info'] = request.session['dataset_info']
     
+    # Check if AI is ready
+    if 'ai_data_ready' in request.session:
+        context['ai_ready'] = True
+    
     return render(request, 'home.html', context)
+
+def pass_to_ai(request):
+    """Pass the processed dataset to AI for analysis"""
+    if request.method == 'POST':
+        try:
+            # Check if we have cached cleaned data
+            if 'cached_cleaned_data' not in request.session:
+                return JsonResponse({
+                    'error': 'No processed dataset available. Please upload and process a dataset first.'
+                }, status=400)
+            
+            # Mark AI as ready
+            request.session['ai_data_ready'] = True
+            
+            # Get dataset info for display
+            file_info = request.session.get('uploaded_file', {})
+            dataset_info = request.session.get('dataset_info', {})
+            
+            return JsonResponse({
+                'success': True,
+                'message': 'Dataset passed to AI successfully!',
+                'dataset_name': file_info.get('original_name', 'Unknown Dataset'),
+                'rows': dataset_info.get('rows', 0),
+                'columns': dataset_info.get('columns', 0)
+            })
+            
+        except Exception as e:
+            return JsonResponse({
+                'error': f'Error passing data to AI: {str(e)}'
+            }, status=500)
+    
+    return JsonResponse({'error': 'Invalid request method'}, status=405)
 
 def process_dataset(request):
     """Process the uploaded dataset"""
@@ -219,12 +403,47 @@ def ai_chat(request):
                 'value_counts': cached_data.get('value_counts', {})
             }
             
+            # Estimate tokens for the request
+            estimated_input_tokens = estimate_tokens(str(context))
+            
+            # Check user token limits
+            if not check_user_token_limit(request.user, estimated_input_tokens):
+                return JsonResponse({
+                    'error': 'You have reached your monthly token limit. Please upgrade your subscription or wait until next month.'
+                }, status=429)
+            
             # Generate AI response using Gemini
             ai_response = generate_gemini_response(context)
             
+            # Track token usage
+            input_tokens = estimated_input_tokens
+            output_tokens = estimate_tokens(ai_response)
+            
+            # Get dataset name from session
+            dataset_name = request.session.get('uploaded_file', {}).get('original_name', 'Unknown Dataset')
+            
+            # Track the usage
+            usage = track_token_usage(
+                user=request.user,
+                session_id=request.session.session_key,
+                dataset_name=dataset_name,
+                question=user_message,
+                input_tokens=input_tokens,
+                output_tokens=output_tokens,
+                model_used='gemini-2.5-flash-lite',
+                response_text=ai_response
+            )
+            
             return JsonResponse({
                 'success': True,
-                'response': ai_response
+                'response': ai_response,
+                'token_usage': {
+                    'input_tokens': input_tokens,
+                    'output_tokens': output_tokens,
+                    'total_tokens': input_tokens + output_tokens,
+                    'cost_usd': float(usage.cost_usd),
+                    'cost_bdt': float(usage.cost_bdt)
+                }
             })
             
         except Exception as e:
@@ -369,29 +588,44 @@ CRITICAL INSTRUCTIONS:
 10. Focus on the actual data patterns and relationships shown.
 
 CHART GENERATION INSTRUCTIONS:
-When appropriate, include ASCII charts and visualizations in your response:
-- Use bar charts with █ characters for distributions
-- Use line charts with ─ and │ characters for trends
-- Use pie charts with ▓ ▒ ░ characters for proportions
-- Use tables with | separators for structured data
-- Use histograms with █ for frequency distributions
-- Use box plots with ┌─┐│└─┘ characters for statistics
+When appropriate, include ASCII charts and visualizations in your response. Use EXACTLY these formats:
 
-Example chart formats:
-```
-Bar Chart:
-Category A: ████████████████████ (20)
-Category B: ████████████ (12)
-Category C: ██████████████████████████ (28)
+BAR CHARTS (use █ characters):
+Category Name: ████████████████████ (count)
+Category Name: ████████████ (count)
 
-Line Chart:
-Value: ──────────────────────────────────────────
-       │    ●    ●    ●    ●    ●    ●    ●
-       │   ●   ●   ●   ●   ●   ●   ●   ●
-       │  ●  ●  ●  ●  ●  ●  ●  ●  ●  ●
-       │ ● ● ● ● ● ● ● ● ● ● ● ● ● ● ● ●
-       └─────────────────────────────────────────
-```
+LINE CHARTS (use ─ and │ characters):
+Chart Title:
+─────────────────────────────────────────
+│    ●    ●    ●    ●    ●    ●    ●
+│   ●   ●   ●   ●   ●   ●   ●   ●
+│  ●  ●  ●  ●  ●  ●  ●  ●  ●  ●
+│ ● ● ● ● ● ● ● ● ● ● ● ● ● ● ● ●
+└─────────────────────────────────────────
+
+PIE CHARTS (use ▓ ▒ ░ characters):
+Chart Title:
+▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓ (50%)
+▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒ (30%)
+░░░░░░░░░░ (20%)
+
+BOX PLOTS (use ┌─┐│└─┘ characters):
+Chart Title:
+┌─────────────────────────────────────┐
+│    ●    ●    ●    ●    ●    ●    ● │
+│   ●   ●   ●   ●   ●   ●   ●   ●   │
+│  ●  ●  ●  ●  ●  ●  ●  ●  ●  ●     │
+│ ● ● ● ● ● ● ● ● ● ● ● ● ● ● ● ●   │
+└─────────────────────────────────────┘
+
+CRITICAL CHART FORMATTING RULES:
+1. Use ONLY the ASCII characters shown above - no HTML, CSS, or styling
+2. Do NOT include any font-family, background, padding, or border-radius instructions
+3. Do NOT include any style attributes or HTML tags
+4. Keep charts simple and clean - just the ASCII characters and text
+5. Always include the count in parentheses for bar charts
+6. Use consistent spacing and formatting
+7. Make sure charts are readable in plain text format
 
 Answer the user's question using ONLY the actual data provided above. Include relevant charts and visualizations when appropriate:"""
 
@@ -432,3 +666,81 @@ Answer the user's question using ONLY the actual data provided above. Include re
     except Exception as e:
         print(f"Error generating AI response: {e}")
         return "Sorry, I encountered an error while processing your request. Please try again."
+
+def token_usage_dashboard(request):
+    """Display token usage dashboard for users"""
+    try:
+        # Get user usage summary
+        usage_summary = get_user_usage_summary(
+            user=request.user if request.user.is_authenticated else None,
+            session_id=request.session.session_key if not request.user.is_authenticated else None,
+            days=30
+        )
+        
+        # Get daily chart data
+        chart_data = get_daily_usage_chart_data(days=30)
+        
+        # Get subscription info if user is authenticated
+        subscription_info = None
+        if request.user.is_authenticated:
+            from .models import UserSubscription
+            subscription_info = UserSubscription.objects.filter(user=request.user).first()
+        
+        context = {
+            'usage_summary': usage_summary,
+            'chart_data': chart_data,
+            'subscription_info': subscription_info,
+            'subscription_tiers': get_subscription_tiers()
+        }
+        
+        return render(request, 'token_dashboard.html', context)
+        
+    except Exception as e:
+        print(f"Token Dashboard Error: {str(e)}")
+        messages.error(request, f'Error loading token usage dashboard: {str(e)}')
+        return render(request, 'token_dashboard.html', {'error': str(e)})
+
+def api_token_usage(request):
+    """API endpoint to get token usage data"""
+    if request.method == 'GET':
+        try:
+            days = int(request.GET.get('days', 30))
+            
+            usage_summary = get_user_usage_summary(
+                user=request.user if request.user.is_authenticated else None,
+                session_id=request.session.session_key if not request.user.is_authenticated else None,
+                days=days
+            )
+            
+            return JsonResponse({
+                'success': True,
+                'usage_summary': usage_summary
+            })
+            
+        except Exception as e:
+            return JsonResponse({
+                'success': False,
+                'error': str(e)
+            }, status=500)
+    
+    return JsonResponse({'error': 'Invalid request method'}, status=405)
+
+def api_daily_usage(request):
+    """API endpoint to get daily usage chart data"""
+    if request.method == 'GET':
+        try:
+            days = int(request.GET.get('days', 30))
+            chart_data = get_daily_usage_chart_data(days=days)
+            
+            return JsonResponse({
+                'success': True,
+                'chart_data': chart_data
+            })
+            
+        except Exception as e:
+            return JsonResponse({
+                'success': False,
+                'error': str(e)
+            }, status=500)
+    
+    return JsonResponse({'error': 'Invalid request method'}, status=405)
