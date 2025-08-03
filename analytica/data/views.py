@@ -7,6 +7,10 @@ from datetime import datetime
 import json
 import requests
 import time
+import google.generativeai as genai
+
+# Configure Gemini API
+genai.configure(api_key="AIzaSyBa8X7pjpMQFwn5OkzrW4IvSKGMECJWd44")
 
 # Create your views here.
 def home(request):
@@ -96,6 +100,9 @@ def home(request):
                     
                     messages.success(request, f'File "{uploaded_file.name}" uploaded successfully!')
                     
+                    # Redirect to prevent POST resubmission
+                    return redirect('home')
+                    
                 except Exception as e:
                     messages.error(request, f'Error reading dataset: {str(e)}')
                     return render(request, 'home.html', context)
@@ -144,7 +151,10 @@ def process_dataset(request):
                     'sample_data': cleaned_df.head(10).to_dict('records'),
                     'summary_stats': cleaned_df.describe().to_dict(),
                     'missing_values': cleaned_df.isnull().sum().to_dict(),
-                    'cleaning_report': cleaning_report
+                    'cleaning_report': cleaning_report,
+                    # Add actual data for AI analysis - send first 500 rows or entire dataset if smaller
+                    'full_data': cleaned_df.to_dict('records'),  # All rows for analysis
+                    'value_counts': {col: cleaned_df[col].value_counts().to_dict() for col in cleaned_df.columns}
                 }
                 
                 # Store cleaned dataset info
@@ -172,7 +182,7 @@ def process_dataset(request):
     return JsonResponse({'error': 'Invalid request method'}, status=405)
 
 def ai_chat(request):
-    """Handle AI chat requests with cached data"""
+    """Handle AI chat requests with cached data using Gemini API"""
     if request.method == 'POST':
         try:
             data = json.loads(request.body)
@@ -183,6 +193,11 @@ def ai_chat(request):
                 return JsonResponse({
                     'error': 'No dataset available. Please upload and process a dataset first.'
                 }, status=400)
+            
+            # Debug: Print session info
+            print(f"DEBUG - Session data available:")
+            print(f"Cached data keys: {list(request.session.get('cached_cleaned_data', {}).keys())}")
+            print(f"Session keys: {list(request.session.keys())}")
             
             cached_data = request.session['cached_cleaned_data']
             
@@ -198,11 +213,14 @@ def ai_chat(request):
                     'summary_stats': cached_data['summary_stats']
                 },
                 'cleaning_report': cached_data['cleaning_report'],
-                'user_question': user_message
+                'user_question': user_message,
+                # Add actual data for AI analysis
+                'full_data': cached_data.get('full_data', []),
+                'value_counts': cached_data.get('value_counts', {})
             }
             
-            # Generate AI response using our existing AI infrastructure
-            ai_response = generate_ai_response(context)
+            # Generate AI response using Gemini
+            ai_response = generate_gemini_response(context)
             
             return JsonResponse({
                 'success': True,
@@ -210,15 +228,34 @@ def ai_chat(request):
             })
             
         except Exception as e:
+            print(f"AI Chat Error: {str(e)}")
+            import traceback
+            traceback.print_exc()
             return JsonResponse({
                 'error': f'Error processing chat request: {str(e)}'
             }, status=500)
     
     return JsonResponse({'error': 'Invalid request method'}, status=405)
 
-def generate_ai_response(context):
-    """Generate AI response using Ollama AI only"""
+def generate_gemini_response(context):
+    """Generate AI response using Google Gemini API"""
     try:
+        # Get user tier (default to basic for now)
+        user_tier = 'basic'  # You can implement tier logic later
+        
+        # Select model based on tier
+        if user_tier == 'basic':
+            model_name = 'gemini-2.5-flash-lite'
+        elif user_tier == 'premium':
+            model_name = 'gemini-2.5-flash'
+        else:
+            model_name = 'gemini-2.5-pro'
+        
+        print(f"🤖 DEBUG - Using Gemini model: {model_name}")
+        
+        # Initialize Gemini model
+        model = genai.GenerativeModel(model_name)
+        
         # Create a focused data summary
         dataset_info = context['dataset_info']
         cleaning_report = context['cleaning_report']
@@ -265,46 +302,132 @@ def generate_ai_response(context):
         except:
             pass
         
-        # Prepare a very focused prompt
-        prompt = f"""You are analyzing a real dataset with the following characteristics:
-
-Dataset: {dataset_info['rows']} rows, {dataset_info['columns']} columns
-Columns: {', '.join(dataset_info['column_names'][:8])}{'...' if len(dataset_info['column_names']) > 8 else ''}
-Missing: {missing_count}, Duplicates: {duplicate_count}
-
-Key statistics: {', '.join([f"{col}(mean={stats['mean']})" for col, stats in key_stats.items()])}
-
-User Question: {context['user_question']}
-
-IMPORTANT: Analyze the actual data provided above. Do NOT provide code examples, SQL queries, or programming instructions. Instead, give insights about the data patterns, trends, and findings based on the statistics shown. Focus on what the data reveals about the subject matter.
-
-Provide a brief, insightful analysis:"""
+        # Prepare a very focused prompt with actual data
+        full_data = context.get('full_data', [])
+        value_counts = context.get('value_counts', {})
         
-        # Use Ollama API for AI response
-        ollama_url = "http://localhost:11434/api/generate"
+        # Send first 500 rows or entire dataset if smaller
+        total_rows = len(full_data)
+        rows_to_send = min(500, total_rows)
+        data_sample = full_data[:rows_to_send] if full_data else []
         
-        payload = {
-            "model": "tinyllama:latest",  # Use TinyLlama for speed
-            "prompt": prompt,
-            "stream": False,
-            "options": {
-                "num_ctx": 1024,   # Smaller context for TinyLlama
-                "num_thread": 4,    # Fewer threads for TinyLlama
-                "temperature": 0.3, # Lower temperature for focused responses
-                "top_k": 20,        # Smaller token selection
-                "top_p": 0.8        # Nucleus sampling
-            }
-        }
+        print(f"📊 DEBUG - Sending {rows_to_send} rows out of {total_rows} total rows to Gemini")
         
-        response = requests.post(ollama_url, json=payload, timeout=180)  # 180 second timeout for Ollama responses
-        
-        if response.status_code == 200:
-            result = response.json()
-            ai_response = result.get('response', 'I apologize, but I couldn\'t generate a response at this time.')
-            return ai_response
+        # Format data sample clearly
+        data_sample_str = ""
+        if data_sample:
+            data_sample_str = f"ACTUAL DATASET (first {rows_to_send} rows):\n"
+            for i, row in enumerate(data_sample[:10]):  # Show first 10 rows in prompt
+                data_sample_str += f"Row {i+1}: {row}\n"
+            if len(data_sample) > 10:
+                data_sample_str += f"... (showing first 10 rows out of {rows_to_send} rows sent)\n"
         else:
-            print(f"Ollama API error: {response.status_code} - {response.text}")
-            return "Sorry, I'm having trouble connecting to the AI service. Please check if Ollama is running."
+            data_sample_str = "No data available"
+        
+        # Create value counts summary with clear formatting
+        value_counts_str = ""
+        if value_counts:
+            value_counts_str = "DATASET SUMMARY:\n"
+            for col, counts in value_counts.items():
+                if counts:
+                    # Generic approach - show top values for each column
+                    top_values = dict(list(counts.items())[:5])  # Top 5 values
+                    value_counts_str += f"{col}: {top_values}\n"
+        
+        # Check if this is a simple greeting
+        user_question = context['user_question'].lower().strip()
+        if user_question in ['hi', 'hello', 'hey', 'good morning', 'good afternoon', 'good evening']:
+            return "Hello! I'm ready to analyze your dataset. Ask me anything about your data - I can provide summaries, distributions, correlations, or answer specific questions about your dataset."
+        
+        # Create a domain-agnostic prompt with chart generation instructions
+        prompt = f"""You are analyzing a REAL dataset. Here is the ACTUAL data:
+
+DATASET INFO:
+- Rows: {dataset_info['rows']} records
+- Columns: {dataset_info['columns']}
+- Column names: {', '.join(dataset_info['column_names'])}
+- Missing values: {missing_count}
+- Duplicate rows: {duplicate_count}
+- Data sent to analysis: {rows_to_send} rows
+
+{data_sample_str}
+
+{value_counts_str}
+
+USER QUESTION: {context['user_question']}
+
+CRITICAL INSTRUCTIONS:
+1. You MUST use the ACTUAL data provided above to answer the question.
+2. Do NOT make up or guess values - use only the real data shown.
+3. If asked for counts, use the value_counts data provided.
+4. If asked for distributions, use the actual value distributions shown.
+5. Format any tables in markdown format with | separators.
+6. Be specific about the actual values in the dataset.
+7. Do NOT provide generic responses - analyze the real data.
+8. Do NOT confuse column values with record counts.
+9. Interpret the data correctly: each row represents one record.
+10. Focus on the actual data patterns and relationships shown.
+
+CHART GENERATION INSTRUCTIONS:
+When appropriate, include ASCII charts and visualizations in your response:
+- Use bar charts with █ characters for distributions
+- Use line charts with ─ and │ characters for trends
+- Use pie charts with ▓ ▒ ░ characters for proportions
+- Use tables with | separators for structured data
+- Use histograms with █ for frequency distributions
+- Use box plots with ┌─┐│└─┘ characters for statistics
+
+Example chart formats:
+```
+Bar Chart:
+Category A: ████████████████████ (20)
+Category B: ████████████ (12)
+Category C: ██████████████████████████ (28)
+
+Line Chart:
+Value: ──────────────────────────────────────────
+       │    ●    ●    ●    ●    ●    ●    ●
+       │   ●   ●   ●   ●   ●   ●   ●   ●
+       │  ●  ●  ●  ●  ●  ●  ●  ●  ●  ●
+       │ ● ● ● ● ● ● ● ● ● ● ● ● ● ● ● ●
+       └─────────────────────────────────────────
+```
+
+Answer the user's question using ONLY the actual data provided above. Include relevant charts and visualizations when appropriate:"""
+
+        # Debug: Print what data we're sending to AI
+        print(f"DEBUG - Data being sent to Gemini:")
+        print(f"Dataset rows: {dataset_info['rows']}")
+        print(f"Dataset columns: {dataset_info['columns']}")
+        print(f"Column names: {dataset_info['column_names']}")
+        print(f"Value counts keys: {list(value_counts.keys())}")
+        print(f"Sample data available: {len(full_data)} rows")
+        print(f"Rows sent to Gemini: {rows_to_send}")
+        print(f"User question: {context['user_question']}")
+        
+        # Debug: Print actual value counts to verify data
+        print(f"DEBUG - Actual value counts:")
+        for col, counts in value_counts.items():
+            print(f"{col}: {dict(list(counts.items())[:3])}")  # Show first 3 values
+        
+        # Generate response using Gemini
+        print(f"🔗 DEBUG - Sending request to Gemini API...")
+        print(f"🤖 Model: {model_name}")
+        print(f"📝 Prompt length: {len(prompt)} characters")
+        
+        try:
+            response = model.generate_content(prompt)
+            print(f"✅ DEBUG - Gemini API response successful!")
+            
+            ai_response = response.text
+            print(f"🤖 DEBUG - AI Response length: {len(ai_response)} characters")
+            print(f"📝 DEBUG - AI Response preview: {ai_response[:200]}...")
+            
+            return ai_response
+            
+        except Exception as e:
+            print(f"❌ DEBUG - Gemini API error: {str(e)}")
+            return f"Sorry, I'm having trouble connecting to the AI service. Error: {str(e)}"
             
     except Exception as e:
         print(f"Error generating AI response: {e}")

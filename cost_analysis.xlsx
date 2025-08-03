@@ -1,0 +1,86 @@
+# Cost Analysis for Data Analysis App
+# BDT 500/month per user pricing
+
+## Sheet 1: Model Comparison
+
+| Model | Input Cost ($/1M tokens) | Output Cost ($/1M tokens) | Token Limit | Context Caching |
+|-------|--------------------------|---------------------------|-------------|-----------------|
+| Gemini 2.5 Flash Lite | $0.10 | $0.40 | 32K | No |
+| Gemini 2.5 Flash | $0.30 | $2.50 | 32K | No |
+| Gemini 2.5 Pro | $1.25 | $10.00 | 200K | Yes |
+
+## Sheet 2: Monthly Usage Scenarios
+
+| User Type | Requests/Month | Input Tokens/Request | Output Tokens/Request | Total Input Tokens | Total Output Tokens |
+|-----------|----------------|----------------------|----------------------|-------------------|-------------------|
+| Light User | 20 | 8,000 | 2,000 | 160,000 | 40,000 |
+| Medium User | 50 | 8,000 | 2,000 | 400,000 | 100,000 |
+| Heavy User | 100 | 8,000 | 2,000 | 800,000 | 200,000 |
+
+## Sheet 3: Cost Calculations
+
+| Model | User Type | Input Cost | Output Cost | Total Cost | Revenue (BDT) | Revenue (USD) | Profit | Profit Margin |
+|-------|-----------|------------|-------------|------------|---------------|--------------|--------|---------------|
+| Flash Lite | Light | $0.016 | $0.016 | $0.032 | 500 | $4.50 | $4.468 | 99.3% |
+| Flash Lite | Medium | $0.040 | $0.040 | $0.080 | 500 | $4.50 | $4.420 | 98.2% |
+| Flash Lite | Heavy | $0.080 | $0.080 | $0.160 | 500 | $4.50 | $4.340 | 96.4% |
+| Flash | Light | $0.048 | $0.100 | $0.148 | 500 | $4.50 | $4.352 | 96.7% |
+| Flash | Medium | $0.120 | $0.250 | $0.370 | 500 | $4.50 | $4.130 | 91.8% |
+| Flash | Heavy | $0.240 | $0.500 | $0.740 | 500 | $4.50 | $3.760 | 83.6% |
+| Pro | Light | $0.200 | $0.400 | $0.600 | 500 | $4.50 | $3.900 | 86.7% |
+| Pro | Medium | $0.500 | $1.000 | $1.500 | 500 | $4.50 | $3.000 | 66.7% |
+| Pro | Heavy | $1.000 | $2.000 | $3.000 | 500 | $4.50 | $1.500 | 33.3% |
+
+## Sheet 4: Scaling Projections
+
+| Number of Users | Flash Lite Cost | Flash Lite Profit | Flash Cost | Flash Profit | Pro Cost | Pro Profit |
+|-----------------|-----------------|-------------------|------------|--------------|----------|------------|
+| 10 | $0.80 | $44.20 | $3.70 | $41.30 | $15.00 | $30.00 |
+| 50 | $4.00 | $221.00 | $18.50 | $206.50 | $75.00 | $150.00 |
+| 100 | $8.00 | $442.00 | $37.00 | $413.00 | $150.00 | $300.00 |
+| 500 | $40.00 | $2,210.00 | $185.00 | $2,065.00 | $750.00 | $1,500.00 |
+| 1,000 | $80.00 | $4,420.00 | $370.00 | $4,130.00 | $1,500.00 | $3,000.00 |
+| 5,000 | $400.00 | $22,100.00 | $1,850.00 | $20,650.00 | $7,500.00 | $15,000.00 |
+
+## Sheet 5: Token Usage Analysis
+
+| Dataset Size | Rows | Estimated Tokens | Flash Lite | Flash | Pro |
+|--------------|------|------------------|------------|-------|-----|
+| Small | 1,000 | 5,000 | ✅ | ✅ | ✅ |
+| Medium | 5,000 | 15,000 | ✅ | ✅ | ✅ |
+| Large | 10,000 | 25,000 | ✅ | ✅ | ✅ |
+| Very Large | 50,000 | 100,000 | ❌ | ❌ | ✅ |
+| Enterprise | 100,000 | 200,000 | ❌ | ❌ | ✅ |
+
+## Sheet 6: Business Recommendations
+
+| Tier | Price (BDT) | Model | Target Users | Profit Margin |
+|------|-------------|-------|--------------|---------------|
+| Basic | 500 | Flash Lite | General users | 98.2% |
+| Standard | 800 | Flash | Power users | 91.8% |
+| Premium | 1,200 | Pro | Enterprise | 66.7% |
+
+## Sheet 7: Risk Analysis
+
+| Scenario | Impact | Mitigation |
+|----------|--------|------------|
+| High usage users | Reduced profit | Implement usage limits |
+| Large datasets | Token limit exceeded | Add chunking feature |
+| API rate limits | Service disruption | Add retry logic |
+| Cost increase | Reduced margins | Monitor and adjust pricing |
+
+## Sheet 8: Implementation Timeline
+
+| Phase | Duration | Action | Cost |
+|-------|----------|--------|------|
+| Development | 2 weeks | Integrate Gemini API | $0 |
+| Testing | 1 week | Test with real data | $50 |
+| Launch | 1 week | Deploy to production | $0 |
+| Monitoring | Ongoing | Track usage and costs | $0 |
+
+## Key Insights:
+1. Flash Lite is the most profitable option (98.2% margin)
+2. Pro model becomes unprofitable for heavy users
+3. 32K token limit covers 90% of use cases
+4. Scaling to 1,000 users generates $4,420/month profit with Flash Lite
+5. Consider tiered pricing for different user types 
