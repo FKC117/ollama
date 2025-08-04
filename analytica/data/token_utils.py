@@ -17,29 +17,16 @@ def estimate_tokens(text):
 
 def calculate_token_costs(input_tokens, output_tokens, model_name='gemini-2.5-flash-lite'):
     """
-    Calculate costs for input and output tokens
+    Calculate costs for input and output tokens using centralized model config
     """
-    # Default Gemini 2.5 Flash Lite pricing (per 1M tokens)
-    pricing = {
-        'gemini-2.5-flash-lite': {
-            'input_price_per_million': 0.1,  # USD
-            'output_price_per_million': 0.4,  # USD
-        },
-        'gemini-2.5-flash': {
-            'input_price_per_million': 0.3,  # USD
-            'output_price_per_million': 2.5,  # USD
-        },
-        'gemini-2.5-pro': {
-            'input_price_per_million': 1.25,  # USD
-            'output_price_per_million': 10.0,  # USD
-        }
-    }
+    # Import model configuration from views
+    from .views import MODEL_CONFIGS
     
-    model_pricing = pricing.get(model_name, pricing['gemini-2.5-flash-lite'])
+    model_config = MODEL_CONFIGS.get(model_name, MODEL_CONFIGS['gemini-2.5-flash-lite'])
     
-    # Calculate costs
-    input_cost_usd = (input_tokens / 1_000_000) * model_pricing['input_price_per_million']
-    output_cost_usd = (output_tokens / 1_000_000) * model_pricing['output_price_per_million']
+    # Calculate costs using model-specific pricing
+    input_cost_usd = (input_tokens / 1_000_000) * model_config['cost_per_million_input']
+    output_cost_usd = (output_tokens / 1_000_000) * model_config['cost_per_million_output']
     total_cost_usd = input_cost_usd + output_cost_usd
     
     # Convert to BDT (current exchange rate ~117.50)

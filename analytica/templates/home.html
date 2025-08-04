@@ -603,7 +603,7 @@
          }
 
         // Chat functionality
-        function addMessage(sender, message) {
+        function addMessage(sender, message, chartData = null) {
             const chatMessages = document.getElementById('chatMessages');
             const messageDiv = document.createElement('div');
             messageDiv.className = `message ${sender}`;
@@ -613,6 +613,17 @@
             } else {
                 // Format AI response with proper table rendering and chart display
                 let formattedMessage = message;
+                
+                // Aggressive cleanup of any embedded HTML/CSS styling first
+                formattedMessage = formattedMessage.replace(/<[^>]*>/g, ''); // Remove all HTML tags
+                formattedMessage = formattedMessage.replace(/style="[^"]*"/g, ''); // Remove style attributes
+                formattedMessage = formattedMessage.replace(/font-family:\s*[^;]+/g, ''); // Remove font-family
+                formattedMessage = formattedMessage.replace(/background:\s*[^;]+/g, ''); // Remove background
+                formattedMessage = formattedMessage.replace(/padding:\s*[^;]+/g, ''); // Remove padding
+                formattedMessage = formattedMessage.replace(/border-radius:\s*[^;]+/g, ''); // Remove border-radius
+                formattedMessage = formattedMessage.replace(/linear-gradient\([^)]+\)/g, ''); // Remove gradients
+                formattedMessage = formattedMessage.replace(/&[a-zA-Z]+;/g, ''); // Remove HTML entities
+                formattedMessage = formattedMessage.replace(/\s+/g, ' '); // Clean up extra whitespace
                 
                 // Convert markdown-style tables to HTML tables
                 // First, find all table blocks (lines starting and ending with |)
@@ -652,71 +663,31 @@
                 // Convert italic text
                 formattedMessage = formattedMessage.replace(/\*(.+?)\*/g, '<em>$1</em>');
                 
-                // Format ASCII charts with better styling
-                // First, clean up any HTML/CSS that might be embedded in the chart strings
-                formattedMessage = formattedMessage.replace(/font-family:\s*monospace;\s*background:\s*#[a-fA-F0-9]+;\s*padding:\s*\d+px;\s*border-radius:\s*\d+px;/g, '');
-                formattedMessage = formattedMessage.replace(/style="[^"]*"/g, '');
+                // Start building the message content
+                let messageContent = `<strong>AI Assistant:</strong> ${formattedMessage}`;
                 
-                // Enhanced bar charts with █ characters - more flexible pattern
-                formattedMessage = formattedMessage.replace(/([^:]+):\s*(█+)\s*\((\d+)\)/g, function(match, label, bars, count) {
-                    const percentage = Math.round((bars.length / 20) * 100);
-                    return `<div class="chart-container mb-2">
-                        <div class="chart-label">${label}:</div>
-                        <div class="chart-bar">
-                            <div class="chart-fill" style="width: ${percentage}%; background: linear-gradient(90deg, #667eea, #764ba2);">
-                                ${bars} (${count})
+                // Add PNG chart if available
+                if (chartData && chartData.image) {
+                    const chartDiv = document.createElement('div');
+                    chartDiv.className = 'chart-container mt-3 mb-3';
+                    chartDiv.innerHTML = `
+                        <div class="card">
+                            <div class="card-header">
+                                <h6 class="mb-0">📊 ${chartData.column} Distribution</h6>
+                            </div>
+                            <div class="card-body text-center">
+                                <img src="data:image/png;base64,${chartData.image}" 
+                                     alt="${chartData.column} Chart" 
+                                     class="img-fluid" 
+                                     style="max-width: 100%; height: auto;">
                             </div>
                         </div>
-                    </div>`;
-                });
-                
-                // Simple bar charts without count (kept for backward compatibility or simpler patterns)
-                formattedMessage = formattedMessage.replace(/([^:]+):\s*(█+)/g, function(match, label, bars) {
-                    const percentage = Math.round((bars.length / 20) * 100);
-                    return `<div class="chart-container mb-2">
-                        <div class="chart-label">${label}:</div>
-                        <div class="chart-bar">
-                            <div class="chart-fill" style="width: ${percentage}%; background: linear-gradient(90deg, #667eea, #764ba2);">
-                                ${bars} (${bars.length})
-                            </div>
-                        </div>
-                    </div>`;
-                });
-                
-                // Line charts with ─ and │ characters
-                formattedMessage = formattedMessage.replace(/([^:]+):\s*([─│●\s]+)/g, function(match, label, chart) {
-                    return `<div class="chart-container mb-2">
-                        <div class="chart-label">${label}:</div>
-                        <div class="chart-line" style="font-family: monospace; background: #f8f9fa; padding: 10px; border-radius: 5px;">
-                            ${chart}
-                        </div>
-                    </div>`;
-                });
-                
-                // Pie charts with ▓ ▒ ░ characters
-                formattedMessage = formattedMessage.replace(/([^:]+):\s*([▓▒░]+)/g, function(match, label, chart) {
-                    return `<div class="chart-container mb-2">
-                        <div class="chart-label">${label}:</div>
-                        <div class="chart-pie" style="font-family: monospace; background: #f8f9fa; padding: 10px; border-radius: 5px;">
-                            ${chart}
-                        </div>
-                    </div>`;
-                });
-                
-                // Box plots with ┌─┐│└─┘ characters
-                formattedMessage = formattedMessage.replace(/([^:]+):\s*([┌─┐│└─┘\s]+)/g, function(match, label, chart) {
-                    return `<div class="chart-container mb-2">
-                        <div class="chart-label">${label}:</div>
-                        <div class="chart-box" style="font-family: monospace; background: #f8f9fa; padding: 10px; border-radius: 5px;">
-                            ${chart}
-                        </div>
-                    </div>`;
-                });
-                
-                // Debug: Log any remaining chart patterns
-                console.log('Formatted message:', formattedMessage);
-                
-                messageDiv.innerHTML = `<strong>AI Assistant:</strong> ${formattedMessage}`;
+                    `;
+                    messageDiv.innerHTML = messageContent;
+                    messageDiv.appendChild(chartDiv);
+                } else {
+                    messageDiv.innerHTML = messageContent;
+                }
             }
             
             chatMessages.appendChild(messageDiv);
@@ -771,7 +742,13 @@
                 .then(data => {
                     document.querySelector('.typing').remove();
                     if (data.success) {
-                        addMessage('ai', data.response);
+                        // Handle new response format with optional chart data
+                        addMessage('ai', data.response, data.chart);
+                        
+                        // Update usage display if available
+                        if (data.token_usage) {
+                            updateUsageDisplay(data.token_usage);
+                        }
                     } else {
                         addMessage('ai', data.error || 'Sorry, I encountered an error. Please try again.');
                     }
@@ -786,6 +763,19 @@
                         addMessage('ai', 'Sorry, I\'m having trouble connecting. Please check if the AI service is running.');
                     }
                 });
+            }
+        }
+
+        // Function to update usage display
+        function updateUsageDisplay(usage) {
+            const usageElement = document.getElementById('tokenUsage');
+            if (usageElement && usage) {
+                usageElement.innerHTML = `
+                    <small class="text-muted">
+                        Tokens: ${usage.total_tokens} / ${usage.monthly_token_limit || '∞'}<br>
+                        Cost: $${usage.cost_usd.toFixed(4)} / ৳${usage.cost_bdt.toFixed(2)}
+                    </small>
+                `;
             }
         }
 

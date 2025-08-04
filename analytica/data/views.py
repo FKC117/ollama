@@ -14,9 +14,309 @@ import requests
 import time
 import google.generativeai as genai
 from .token_utils import estimate_tokens, track_token_usage, get_user_usage_summary, get_daily_usage_chart_data, check_user_token_limit, get_subscription_tiers
+import matplotlib.pyplot as plt
+import seaborn as sns
+import base64
+import io
+from django.conf import settings
+import re
 
 # Configure Gemini API
 genai.configure(api_key="AIzaSyBa8X7pjpMQFwn5OkzrW4IvSKGMECJWd44")
+
+# Set matplotlib to use non-interactive backend
+plt.switch_backend('Agg')
+
+# Model configurations with token limits and parameters
+MODEL_CONFIGS = {
+    'gemini-2.5-flash-lite': {
+        'max_output_tokens': 8192,
+        'max_input_tokens': 100000,
+        'temperature': 0.7,
+        'top_p': 0.8,
+        'top_k': 40,
+        'cost_per_million_input': 0.1,
+        'cost_per_million_output': 0.4
+    },
+    'gemini-2.5-flash': {
+        'max_output_tokens': 16384,
+        'max_input_tokens': 100000,
+        'temperature': 0.7,
+        'top_p': 0.8,
+        'top_k': 40,
+        'cost_per_million_input': 0.3,
+        'cost_per_million_output': 2.5
+    },
+    'gemini-2.5-pro': {
+        'max_output_tokens': 32768,
+        'max_input_tokens': 100000,
+        'temperature': 0.7,
+        'top_p': 0.8,
+        'top_k': 40,
+        'cost_per_million_input': 1.25,
+        'cost_per_million_output': 10.0
+    }
+}
+
+def get_model_config(model_name):
+    """
+    Get configuration for a specific model
+    
+    Args:
+        model_name (str): Name of the model
+        
+    Returns:
+        dict: Model configuration
+    """
+    return MODEL_CONFIGS.get(model_name, MODEL_CONFIGS['gemini-2.5-flash-lite'])
+
+def check_model_token_limits(model_name, estimated_input_tokens):
+    """
+    Check if estimated input tokens exceed model limits
+    
+    Args:
+        model_name (str): Name of the model
+        estimated_input_tokens (int): Estimated input tokens
+        
+    Returns:
+        dict: Status and limits info
+    """
+    model_config = get_model_config(model_name)
+    max_input_tokens = model_config['max_input_tokens']
+    
+    return {
+        'within_limits': estimated_input_tokens <= max_input_tokens,
+        'estimated_tokens': estimated_input_tokens,
+        'max_input_tokens': max_input_tokens,
+        'model_name': model_name
+    }
+
+def adjust_data_for_model_limits(model_name, full_data, value_counts):
+    """
+    Adjust the amount of data sent based on model token limits
+    
+    Args:
+        model_name (str): Name of the model
+        full_data (list): Full dataset
+        value_counts (dict): Value counts data
+        
+    Returns:
+        tuple: (adjusted_data, adjusted_value_counts, rows_sent)
+    """
+    model_config = get_model_config(model_name)
+    max_input_tokens = model_config['max_input_tokens']
+    
+    # Start with conservative limits based on model
+    if model_name == 'gemini-2.5-flash-lite':
+        max_rows = 300  # Conservative for flash-lite
+    elif model_name == 'gemini-2.5-flash':
+        max_rows = 500  # More data for flash
+    else:  # gemini-2.5-pro
+        max_rows = 1000  # Most data for pro
+    
+    total_rows = len(full_data)
+    rows_to_send = min(max_rows, total_rows)
+    
+    # Adjust based on actual token estimation
+    sample_data = full_data[:rows_to_send] if full_data else []
+    sample_prompt = f"Sample data: {sample_data[:5]}"  # Test with first 5 rows
+    estimated_tokens = estimate_tokens(sample_prompt)
+    
+    # If still too large, reduce further
+    if estimated_tokens > max_input_tokens * 0.8:  # Leave 20% buffer
+        rows_to_send = max(50, rows_to_send // 2)  # Reduce by half, minimum 50 rows
+    
+    adjusted_data = full_data[:rows_to_send] if full_data else []
+    
+    print(f"📊 DEBUG - Data adjustment for {model_name}:")
+    print(f"   Total rows available: {total_rows}")
+    print(f"   Rows to send: {rows_to_send}")
+    print(f"   Model max input tokens: {max_input_tokens:,}")
+    
+    return adjusted_data, value_counts, rows_to_send
+
+def generate_chart_png(chart_type, data, title=None, x_label=None, y_label=None):
+    """
+    Generate a PNG chart and return it as a base64 encoded string
+    
+    Args:
+        chart_type (str): Type of chart ('bar', 'pie', 'line', 'histogram', 'scatter')
+        data (dict): Data for the chart
+        title (str): Chart title
+        x_label (str): X-axis label
+        y_label (str): Y-axis label
+    
+    Returns:
+        str: Base64 encoded PNG image
+    """
+    try:
+        # Clear any existing plots
+        plt.clf()
+        
+        # Set style
+        sns.set_style("whitegrid")
+        plt.figure(figsize=(10, 6))
+        
+        if chart_type == 'bar':
+            categories = list(data.keys())
+            values = list(data.values())
+            
+            # Create bar chart
+            bars = plt.bar(categories, values, color='skyblue', edgecolor='navy', alpha=0.7)
+            
+            # Add value labels on bars
+            for bar, value in zip(bars, values):
+                plt.text(bar.get_x() + bar.get_width()/2, bar.get_height() + 0.01*max(values),
+                        f'{value}', ha='center', va='bottom', fontweight='bold')
+        
+        elif chart_type == 'pie':
+            categories = list(data.keys())
+            values = list(data.values())
+            
+            # Create pie chart
+            plt.pie(values, labels=categories, autopct='%1.1f%%', startangle=90)
+            plt.axis('equal')
+        
+        elif chart_type == 'line':
+            x_values = list(data.keys())
+            y_values = list(data.values())
+            
+            # Create line chart
+            plt.plot(x_values, y_values, marker='o', linewidth=2, markersize=6)
+        
+        elif chart_type == 'histogram':
+            # For histogram, data should be a list of values
+            plt.hist(data, bins=20, alpha=0.7, color='skyblue', edgecolor='navy')
+        
+        elif chart_type == 'scatter':
+            # For scatter, data should be {'x': [...], 'y': [...]}
+            plt.scatter(data['x'], data['y'], alpha=0.6)
+        
+        # Set title and labels
+        if title:
+            plt.title(title, fontsize=14, fontweight='bold', pad=20)
+        if x_label:
+            plt.xlabel(x_label, fontsize=12)
+        if y_label:
+            plt.ylabel(y_label, fontsize=12)
+        
+        # Rotate x-axis labels if they're long
+        if chart_type in ['bar', 'line']:
+            plt.xticks(rotation=45, ha='right')
+        
+        # Adjust layout
+        plt.tight_layout()
+        
+        # Save to bytes buffer
+        buffer = io.BytesIO()
+        plt.savefig(buffer, format='png', dpi=300, bbox_inches='tight')
+        buffer.seek(0)
+        
+        # Convert to base64
+        image_base64 = base64.b64encode(buffer.getvalue()).decode()
+        buffer.close()
+        
+        # Clear the plot
+        plt.close()
+        
+        return image_base64
+        
+    except Exception as e:
+        print(f"Error generating chart: {e}")
+        return None
+
+def detect_chart_request(user_question, value_counts):
+    """
+    Detect if the user is requesting a chart and determine the type
+    
+    Args:
+        user_question (str): User's question
+        value_counts (dict): Available value counts data
+    
+    Returns:
+        dict: Chart request info or None
+    """
+    question_lower = user_question.lower()
+    
+    # Chart type keywords - more specific to avoid false positives
+    chart_keywords = {
+        'bar': ['bar chart', 'bar graph', 'bar plot', 'show distribution', 'show count'],
+        'pie': ['pie chart', 'pie graph', 'show percentage', 'show proportion'],
+        'line': ['line chart', 'line graph', 'show trend', 'time series'],
+        'histogram': ['histogram', 'show frequency'],
+        'scatter': ['scatter plot', 'scatter graph', 'show correlation']
+    }
+    
+    # Detect chart type with more precise matching
+    detected_type = None
+    for chart_type, keywords in chart_keywords.items():
+        if any(keyword in question_lower for keyword in keywords):
+            detected_type = chart_type
+            break
+    
+    # Debug logging
+    print(f"🔍 DEBUG - Chart detection:")
+    print(f"   Question: '{user_question}'")
+    print(f"   Detected type: {detected_type}")
+    print(f"   Available columns: {list(value_counts.keys())}")
+    
+    if not detected_type:
+        return None
+    
+    # Find relevant data column with more precise matching
+    relevant_column = None
+    question_words = question_lower.split()
+    
+    for col in value_counts.keys():
+        col_lower = col.lower()
+        
+        # Check for exact column name match
+        if col_lower == question_lower:
+            relevant_column = col
+            break
+        
+        # Check for "for [column]" or "of [column]" patterns
+        if f"for {col_lower}" in question_lower or f"of {col_lower}" in question_lower:
+            relevant_column = col
+            break
+        
+        # Check if column name appears as a complete word in the question
+        if col_lower in question_words:
+            relevant_column = col
+            break
+        
+        # Check for partial matches only if column name is longer than 3 characters
+        # to avoid matching common words like "the", "and", "for", etc.
+        if len(col_lower) > 3 and col_lower in question_lower:
+            relevant_column = col
+            break
+    
+    # Only use fallback if no chart type was specifically requested
+    # and we have a reasonable number of columns to choose from
+    if not relevant_column and detected_type in ['bar', 'pie'] and len(value_counts) > 0:
+        # Look for categorical columns with reasonable number of unique values
+        for col, counts in value_counts.items():
+            if len(counts) > 1 and len(counts) <= 15:  # Avoid columns with too many unique values
+                relevant_column = col
+                break
+        
+        # If still no suitable column found, use the first one
+        if not relevant_column and value_counts:
+            relevant_column = list(value_counts.keys())[0]
+    
+    # Debug logging for column detection
+    print(f"   Selected column: {relevant_column}")
+    if relevant_column:
+        print(f"   Column data preview: {dict(list(value_counts[relevant_column].items())[:3])}")
+    
+    if relevant_column and relevant_column in value_counts:
+        return {
+            'type': detected_type,
+            'column': relevant_column,
+            'data': value_counts[relevant_column]
+        }
+    
+    return None
 
 # Authentication Views
 def login_view(request):
@@ -413,7 +713,16 @@ def ai_chat(request):
                 }, status=429)
             
             # Generate AI response using Gemini
-            ai_response = generate_gemini_response(context)
+            ai_result = generate_gemini_response(context)
+            
+            # Handle new response format
+            if isinstance(ai_result, dict):
+                ai_response = ai_result['text']
+                chart_data = ai_result.get('chart')
+            else:
+                # Backward compatibility for old format
+                ai_response = ai_result
+                chart_data = None
             
             # Track token usage
             input_tokens = estimated_input_tokens
@@ -437,6 +746,7 @@ def ai_chat(request):
             return JsonResponse({
                 'success': True,
                 'response': ai_response,
+                'chart': chart_data,
                 'token_usage': {
                     'input_tokens': input_tokens,
                     'output_tokens': output_tokens,
@@ -457,7 +767,7 @@ def ai_chat(request):
     return JsonResponse({'error': 'Invalid request method'}, status=405)
 
 def generate_gemini_response(context):
-    """Generate AI response using Google Gemini API"""
+    """Generate AI response using Google Gemini API with PNG chart support"""
     try:
         # Get user tier (default to basic for now)
         user_tier = 'basic'  # You can implement tier logic later
@@ -525,12 +835,13 @@ def generate_gemini_response(context):
         full_data = context.get('full_data', [])
         value_counts = context.get('value_counts', {})
         
-        # Send first 500 rows or entire dataset if smaller
-        total_rows = len(full_data)
-        rows_to_send = min(500, total_rows)
-        data_sample = full_data[:rows_to_send] if full_data else []
+        # Adjust data based on model limits
+        adjusted_data, adjusted_value_counts, rows_to_send = adjust_data_for_model_limits(
+            model_name, full_data, value_counts
+        )
+        data_sample = adjusted_data
         
-        print(f"📊 DEBUG - Sending {rows_to_send} rows out of {total_rows} total rows to Gemini")
+        print(f"📊 DEBUG - Sending {rows_to_send} rows out of {len(full_data)} total rows to Gemini")
         
         # Format data sample clearly
         data_sample_str = ""
@@ -545,9 +856,9 @@ def generate_gemini_response(context):
         
         # Create value counts summary with clear formatting
         value_counts_str = ""
-        if value_counts:
+        if adjusted_value_counts:
             value_counts_str = "DATASET SUMMARY:\n"
-            for col, counts in value_counts.items():
+            for col, counts in adjusted_value_counts.items():
                 if counts:
                     # Generic approach - show top values for each column
                     top_values = dict(list(counts.items())[:5])  # Top 5 values
@@ -556,9 +867,15 @@ def generate_gemini_response(context):
         # Check if this is a simple greeting
         user_question = context['user_question'].lower().strip()
         if user_question in ['hi', 'hello', 'hey', 'good morning', 'good afternoon', 'good evening']:
-            return "Hello! I'm ready to analyze your dataset. Ask me anything about your data - I can provide summaries, distributions, correlations, or answer specific questions about your dataset."
+            return {
+                'text': "Hello! I'm ready to analyze your dataset. Ask me anything about your data - I can provide summaries, distributions, correlations, or answer specific questions about your dataset.",
+                'chart': None
+            }
         
-        # Create a domain-agnostic prompt with chart generation instructions
+        # Check for chart request
+        chart_request = detect_chart_request(context['user_question'], adjusted_value_counts)
+        
+        # Create a domain-agnostic prompt with emphasis on complete responses
         prompt = f"""You are analyzing a REAL dataset. Here is the ACTUAL data:
 
 DATASET INFO:
@@ -586,86 +903,131 @@ CRITICAL INSTRUCTIONS:
 8. Do NOT confuse column values with record counts.
 9. Interpret the data correctly: each row represents one record.
 10. Focus on the actual data patterns and relationships shown.
+11. Provide COMPLETE and DETAILED responses - do not truncate your analysis.
+12. For quantitative analysis requests, include comprehensive statistics, tables, and insights.
+13. Use clear section headers and organize your response logically.
 
-CHART GENERATION INSTRUCTIONS:
-When appropriate, include ASCII charts and visualizations in your response. Use EXACTLY these formats:
+If the user is requesting a chart or visualization, provide a clear analysis of the data and mention that a chart has been generated. Do NOT include ASCII charts in your response.
 
-BAR CHARTS (use █ characters):
-Category Name: ████████████████████ (count)
-Category Name: ████████████ (count)
-
-LINE CHARTS (use ─ and │ characters):
-Chart Title:
-─────────────────────────────────────────
-│    ●    ●    ●    ●    ●    ●    ●
-│   ●   ●   ●   ●   ●   ●   ●   ●
-│  ●  ●  ●  ●  ●  ●  ●  ●  ●  ●
-│ ● ● ● ● ● ● ● ● ● ● ● ● ● ● ● ●
-└─────────────────────────────────────────
-
-PIE CHARTS (use ▓ ▒ ░ characters):
-Chart Title:
-▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓ (50%)
-▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒ (30%)
-░░░░░░░░░░ (20%)
-
-BOX PLOTS (use ┌─┐│└─┘ characters):
-Chart Title:
-┌─────────────────────────────────────┐
-│    ●    ●    ●    ●    ●    ●    ● │
-│   ●   ●   ●   ●   ●   ●   ●   ●   │
-│  ●  ●  ●  ●  ●  ●  ●  ●  ●  ●     │
-│ ● ● ● ● ● ● ● ● ● ● ● ● ● ● ● ●   │
-└─────────────────────────────────────┘
-
-CRITICAL CHART FORMATTING RULES:
-1. Use ONLY the ASCII characters shown above - no HTML, CSS, or styling
-2. Do NOT include any font-family, background, padding, or border-radius instructions
-3. Do NOT include any style attributes or HTML tags
-4. Keep charts simple and clean - just the ASCII characters and text
-5. Always include the count in parentheses for bar charts
-6. Use consistent spacing and formatting
-7. Make sure charts are readable in plain text format
-
-Answer the user's question using ONLY the actual data provided above. Include relevant charts and visualizations when appropriate:"""
+Provide a COMPLETE and DETAILED answer to the user's question using ONLY the actual data provided above. Include relevant analysis, insights, and recommendations:"""
 
         # Debug: Print what data we're sending to AI
         print(f"DEBUG - Data being sent to Gemini:")
         print(f"Dataset rows: {dataset_info['rows']}")
         print(f"Dataset columns: {dataset_info['columns']}")
         print(f"Column names: {dataset_info['column_names']}")
-        print(f"Value counts keys: {list(value_counts.keys())}")
+        print(f"Value counts keys: {list(adjusted_value_counts.keys())}")
         print(f"Sample data available: {len(full_data)} rows")
         print(f"Rows sent to Gemini: {rows_to_send}")
         print(f"User question: {context['user_question']}")
         
         # Debug: Print actual value counts to verify data
         print(f"DEBUG - Actual value counts:")
-        for col, counts in value_counts.items():
+        for col, counts in adjusted_value_counts.items():
             print(f"{col}: {dict(list(counts.items())[:3])}")  # Show first 3 values
+        
+        # Check model token limits
+        estimated_input_tokens = estimate_tokens(prompt)
+        token_limit_check = check_model_token_limits(model_name, estimated_input_tokens)
+        
+        print(f"🔍 DEBUG - Token limit check:")
+        print(f"   Model: {token_limit_check['model_name']}")
+        print(f"   Estimated input tokens: {token_limit_check['estimated_tokens']}")
+        print(f"   Max input tokens: {token_limit_check['max_input_tokens']}")
+        print(f"   Within limits: {token_limit_check['within_limits']}")
+        
+        if not token_limit_check['within_limits']:
+            return {
+                'text': f"Sorry, your request is too large for the {model_name} model. The prompt requires {estimated_input_tokens:,} tokens, but the model limit is {token_limit_check['max_input_tokens']:,} tokens. Please try a more specific question or use a smaller dataset.",
+                'chart': None
+            }
         
         # Generate response using Gemini
         print(f"🔗 DEBUG - Sending request to Gemini API...")
         print(f"🤖 Model: {model_name}")
         print(f"📝 Prompt length: {len(prompt)} characters")
+        print(f"📊 Estimated tokens: {estimated_input_tokens:,}")
         
         try:
-            response = model.generate_content(prompt)
+            # Get model configuration
+            model_config = get_model_config(model_name)
+            
+            # Configure generation parameters for longer responses
+            generation_config = {
+                'max_output_tokens': model_config['max_output_tokens'],  # Use model-specific max tokens
+                'temperature': model_config['temperature'],
+                'top_p': model_config['top_p'],
+                'top_k': model_config['top_k']
+            }
+            
+            response = model.generate_content(
+                prompt,
+                generation_config=generation_config
+            )
             print(f"✅ DEBUG - Gemini API response successful!")
             
             ai_response = response.text
             print(f"🤖 DEBUG - AI Response length: {len(ai_response)} characters")
             print(f"📝 DEBUG - AI Response preview: {ai_response[:200]}...")
             
-            return ai_response
+            # Check if response was truncated
+            if len(ai_response) < 100 and "quantitative analysis" in context['user_question'].lower():
+                print(f"⚠️ DEBUG - Response seems truncated for analysis request")
+                # Try to get a more complete response by being more specific
+                ai_response += "\n\n[Note: This response was limited. For a complete quantitative analysis, please ask for specific aspects like 'demographics analysis', 'treatment outcomes', or 'survival rates' separately.]"
+            
+            # Check for API truncation indicators
+            if hasattr(response, 'candidates') and response.candidates:
+                candidate = response.candidates[0]
+                if hasattr(candidate, 'finish_reason'):
+                    print(f"🔍 DEBUG - Response finish reason: {candidate.finish_reason}")
+                    if candidate.finish_reason == 'MAX_TOKENS':
+                        print(f"⚠️ DEBUG - Response was truncated due to token limit")
+                        ai_response += "\n\n[Note: This response was truncated due to length limits. Please ask for more specific aspects of the analysis.]"
+            
+            # Generate chart if requested
+            chart_data = None
+            if chart_request:
+                print(f"📊 DEBUG - Chart request detected: {chart_request['type']} for {chart_request['column']}")
+                
+                # Generate the chart
+                chart_base64 = generate_chart_png(
+                    chart_type=chart_request['type'],
+                    data=chart_request['data'],
+                    title=f"{chart_request['column']} Distribution",
+                    x_label=chart_request['column'],
+                    y_label="Count"
+                )
+                
+                if chart_base64:
+                    chart_data = {
+                        'type': chart_request['type'],
+                        'column': chart_request['column'],
+                        'image': chart_base64
+                    }
+                    print(f"✅ DEBUG - Chart generated successfully!")
+                else:
+                    print(f"❌ DEBUG - Failed to generate chart")
+            
+            # Return response with optional chart data
+            return {
+                'text': ai_response,
+                'chart': chart_data
+            }
             
         except Exception as e:
             print(f"❌ DEBUG - Gemini API error: {str(e)}")
-            return f"Sorry, I'm having trouble connecting to the AI service. Error: {str(e)}"
+            return {
+                'text': f"Sorry, I'm having trouble connecting to the AI service. Error: {str(e)}",
+                'chart': None
+            }
             
     except Exception as e:
         print(f"Error generating AI response: {e}")
-        return "Sorry, I encountered an error while processing your request. Please try again."
+        return {
+            'text': "Sorry, I encountered an error while processing your request. Please try again.",
+            'chart': None
+        }
 
 def token_usage_dashboard(request):
     """Display token usage dashboard for users"""
